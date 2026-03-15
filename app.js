@@ -8,9 +8,12 @@ const firebaseConfig = {
   messagingSenderId: "291381979405",
   appId: "1:291381979405:web:1ce0164f2dfc721b032844"
 };
-let dailyChart; 
+
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+
+let dailyChart;
+
 // ===== TAB SWITCH =====
 function showTab(tabId) {
   document.querySelectorAll(".tab").forEach(tab => {
@@ -85,12 +88,14 @@ client.on("connect", function () {
 client.on("message", function (topic, message) {
 
   const data = JSON.parse(message.toString());
-  const nowStr = new Date().toISOString().replace("T", " ").substring(0, 19); // "YYYY-MM-DD HH:MM:SS"
-const time = data.timestamp ? String(data.timestamp) : nowStr;
+
+  const timestamp = new Date().toISOString();
+  const displayTime = new Date().toLocaleString();
 
   // ===== SpO2 =====
   const spo2El = document.getElementById("spo2");
-  const spo2 = parseFloat(String(data.spo2).replace(/[^\d.]/g, ""));
+  const spo2 = parseFloat(data.spo2);
+
   spo2El.innerText = isNaN(spo2) ? "--" : spo2;
   spo2El.classList.remove("safe", "warning", "danger");
 
@@ -102,7 +107,8 @@ const time = data.timestamp ? String(data.timestamp) : nowStr;
 
   // ===== Temperature =====
   const tempEl = document.getElementById("temp");
-  const temp = parseFloat(String(data.temperature).replace(/[^\d.]/g, ""));
+  const temp = parseFloat(data.temperature);
+
   tempEl.innerText = isNaN(temp) ? "--" : temp;
   tempEl.classList.remove("safe", "warning", "danger");
 
@@ -112,37 +118,44 @@ const time = data.timestamp ? String(data.timestamp) : nowStr;
     else tempEl.classList.add("danger");
   }
 
-  // ===== ECG =====
-  const ecgEl = document.getElementById("ecg");
-  ecgEl.innerText = data.ecg_quality;
-  ecgEl.classList.remove("safe", "warning", "danger");
+  // ===== HEART RATE =====
+  const hrEl = document.getElementById("ecg");
+  const heartRate = parseFloat(data.heart_rate);
 
-  if (data.ecg_quality === "good") ecgEl.classList.add("safe");
-  else if (data.ecg_quality === "noise") ecgEl.classList.add("warning");
-  else ecgEl.classList.add("danger");
+  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate + " BPM";
+  hrEl.classList.remove("safe", "warning", "danger");
 
-  // 🔥 ===== LƯU FIREBASE =====
-  if (!isNaN(spo2) && !isNaN(temp)) {
+  if (!isNaN(heartRate)) {
+    if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
+    else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
+    else hrEl.classList.add("danger");
+  }
+
+  // ===== SAVE FIREBASE =====
+  if (!isNaN(spo2) && !isNaN(temp) && !isNaN(heartRate)) {
     database.ref("healthData").push({
-      timestamp: time,
+      timestamp: timestamp,
       spo2: spo2,
       temperature: temp,
-      ecg_quality: data.ecg_quality
+      heart_rate: heartRate
     });
   }
 
-  // ===== History =====
+  // ===== HISTORY =====
   const historyList = document.getElementById("historyList");
+
   const item = document.createElement("div");
   item.className = "card";
+
   item.innerHTML = `
-    <p><strong>${time}</strong></p>
-    <p>SpO2: ${spo2}% | Temp: ${temp}°C | ECG: ${data.ecg_quality}</p>
+    <p><strong>${displayTime}</strong></p>
+    <p>SpO2: ${spo2}% | Temp: ${temp}°C | Heart Rate: ${heartRate} BPM</p>
   `;
+
   historyList.prepend(item);
 
   // ===== UPDATE CHART =====
-  labels.push(time);
+  labels.push(displayTime);
   spo2Data.push(spo2);
   tempData.push(temp);
 
@@ -154,12 +167,15 @@ const time = data.timestamp ? String(data.timestamp) : nowStr;
 
   spo2Chart.update();
   tempChart.update();
-});
-  
 
+});
+
+// ===== MQTT ERROR =====
 client.on("error", function (err) {
   console.log("MQTT Error:", err);
 });
+
+// ===== LOAD DAILY DATA =====
 function loadDailyData() {
 
   database.ref("healthData").on("value", function(snapshot) {
@@ -171,7 +187,7 @@ function loadDailyData() {
 
     Object.values(data).forEach(item => {
 
-      const date = item.timestamp.substring(0, 10);
+      const date = item.timestamp.substring(0,10);
 
       if (!grouped[date]) {
         grouped[date] = { spo2: [], temp: [] };
@@ -181,34 +197,30 @@ function loadDailyData() {
       grouped[date].temp.push(Number(item.temperature));
     });
 
-    const dates = Object.keys(grouped)
-      .sort()
-      .slice(-3);
+    const dates = Object.keys(grouped).sort().slice(-3);
 
     const avgSpo2 = [];
     const avgTemp = [];
 
-  dates.forEach(d => {
+    dates.forEach(d => {
 
-  const spo2Arr = grouped[d].spo2;
-  const tempArr = grouped[d].temp;
+      const spo2Arr = grouped[d].spo2;
+      const tempArr = grouped[d].temp;
 
-  const spo2Avg =
-    spo2Arr.reduce((sum, val) => sum + Number(val), 0) / spo2Arr.length;
+      const spo2Avg = spo2Arr.reduce((a,b)=>a+b,0)/spo2Arr.length;
+      const tempAvg = tempArr.reduce((a,b)=>a+b,0)/tempArr.length;
 
-  const tempAvg =
-    tempArr.reduce((sum, val) => sum + Number(val), 0) / tempArr.length;
+      avgSpo2.push(Number(spo2Avg.toFixed(1)));
+      avgTemp.push(Number(tempAvg.toFixed(1)));
 
-  avgSpo2.push(Number(spo2Avg.toFixed(1)));
-  avgTemp.push(Number(tempAvg.toFixed(1)));
-
-});
+    });
 
     drawDailyChart(dates, avgSpo2, avgTemp);
 
   });
-
 }
+
+// ===== DRAW DAILY CHART =====
 function drawDailyChart(dates, spo2Data, tempData) {
 
   const canvas = document.getElementById("dailyChart");
@@ -216,7 +228,6 @@ function drawDailyChart(dates, spo2Data, tempData) {
 
   const ctx = canvas.getContext("2d");
 
-  // 🔴 QUAN TRỌNG: destroy chart cũ trước khi vẽ mới
   if (dailyChart) {
     dailyChart.destroy();
   }
