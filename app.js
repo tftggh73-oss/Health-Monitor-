@@ -128,12 +128,46 @@ client.on("message",function(topic,message){
     data.heart_rate ?? data.bpm ?? data.hr ?? data.heartRate
   );
 
-  // ===== DISPLAY =====
-  document.getElementById("spo2").innerText=isNaN(spo2)?"--":spo2;
-  document.getElementById("temp").innerText=isNaN(temp)?"--":temp;
+  // ===== SpO2 DISPLAY + COLOR =====
+  const spo2El=document.getElementById("spo2");
 
+  spo2El.innerText=isNaN(spo2)?"--":spo2;
+
+  spo2El.classList.remove("safe","warning","danger");
+
+  if(!isNaN(spo2)){
+    if(spo2>=95) spo2El.classList.add("safe");
+    else if(spo2>=92) spo2El.classList.add("warning");
+    else spo2El.classList.add("danger");
+  }
+
+
+  // ===== TEMP DISPLAY + COLOR =====
+  const tempEl=document.getElementById("temp");
+
+  tempEl.innerText=isNaN(temp)?"--":temp;
+
+  tempEl.classList.remove("safe","warning","danger");
+
+  if(!isNaN(temp)){
+    if(temp<37.5) tempEl.classList.add("safe");
+    else if(temp<=37.8) tempEl.classList.add("warning");
+    else tempEl.classList.add("danger");
+  }
+
+
+  // ===== HEART RATE DISPLAY + COLOR =====
   const hrEl=document.getElementById("ecg");
+
   hrEl.innerText=isNaN(heartRate)?"--":heartRate+" BPM";
+
+  hrEl.classList.remove("safe","warning","danger");
+
+  if(!isNaN(heartRate)){
+    if(heartRate>=60 && heartRate<=100) hrEl.classList.add("safe");
+    else if(heartRate>=50 && heartRate<=120) hrEl.classList.add("warning");
+    else hrEl.classList.add("danger");
+  }
 
 
   // ===== SAVE FIREBASE =====
@@ -195,8 +229,7 @@ client.on("error",function(err){
 });
 
 
-
-// ===== LOAD DAILY DATA FROM FIREBASE =====
+// ===== LOAD DAILY DATA =====
 function loadDailyData(){
 
   database.ref("healthData").on("value",function(snapshot){
@@ -251,8 +284,7 @@ function loadDailyData(){
 }
 
 
-
-// ===== DRAW DAILY AVERAGE CHART =====
+// ===== DRAW DAILY CHART =====
 function drawDailyChart(dates,spo2Data,tempData,hrData){
 
   const canvas=document.getElementById("dailyChart");
