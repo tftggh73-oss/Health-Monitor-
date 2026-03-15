@@ -1,42 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-  <title>Health Monitor</title>
+  <meta charset="UTF-8">
+  <title>Giám sát sức khỏe</title>
+
+  <!-- MQTT -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+  <!-- Chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="navbar">
-  <button onclick="showTab('live')">Live</button>
-  <button onclick="showTab('history')">History</button>
-  <button onclick="showTab('analytics')">Analytics</button>
+  <button onclick="showTab('live')">Kết quả</button>
+  <button onclick="showTab('history')">Lịch sử</button>
+  <button onclick="showTab('analytics')">Phân tích</button>
 </div>
 
+<!-- LIVE -->
 <div id="live" class="tab">
-  <h2>Live Monitoring</h2>
+  <h2>Giám sát trực tiếp</h2>
+
   <div class="card">
     <h3>SpO2: <span id="spo2">--</span> %</h3>
   </div>
+
   <div class="card">
-    <h3>Temperature: <span id="temp">--</span> °C</h3>
+    <h3>Nhiệt độ: <span id="temp">--</span> °C</h3>
   </div>
+
   <div class="card">
-    <h3>ECG Quality: <span id="ecg">--</span></h3>
+    <h3>Nhịp tim: <span id="ecg">--</span></h3>
   </div>
 </div>
 
+<!-- HISTORY -->
 <div id="history" class="tab" style="display:none;">
-  <h2>History</h2>
+  <h2>Lịch sử dữ liệu</h2>
   <div id="historyList"></div>
 </div>
 
+<!-- ANALYTICS -->
 <div id="analytics" class="tab" style="display:none;">
-  <h2>Analytics & Trends</h2>
+  <h2>Phân tích xu hướng</h2>
 
   <div class="card">
     <canvas id="spo2Chart"></canvas>
@@ -45,9 +59,11 @@
   <div class="card">
     <canvas id="tempChart"></canvas>
   </div>
+
   <div class="card">
-  <canvas id="dailyChart"></canvas>
-</div>
+    <canvas id="dailyChart"></canvas>
+  </div>
+
 </div>
 
 <script src="app.js"></script>
