@@ -7,7 +7,7 @@
   <!-- MQTT -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
-  <!-- Chart -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Firebase -->
@@ -38,8 +38,9 @@
   </div>
 
   <div class="card">
-    <h3>Nhịp tim: <span id="ecg">--</span></h3>
+    <h3>Nhịp tim: <span id="ecg">--</span> BPM</h3>
   </div>
+
 </div>
 
 <!-- HISTORY -->
@@ -58,6 +59,10 @@
 
   <div class="card">
     <canvas id="tempChart"></canvas>
+  </div>
+
+  <div class="card">
+    <canvas id="hrChart"></canvas>
   </div>
 
   <div class="card">
