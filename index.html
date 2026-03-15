@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Health Monitor</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="navbar">
+  <button onclick="showTab('live')">Live</button>
+  <button onclick="showTab('history')">History</button>
+  <button onclick="showTab('analytics')">Analytics</button>
+</div>
+
+<div id="live" class="tab">
+  <h2>Live Monitoring</h2>
+  <div class="card">
+    <h3>SpO2: <span id="spo2">--</span> %</h3>
+  </div>
+  <div class="card">
+    <h3>Temperature: <span id="temp">--</span> °C</h3>
+  </div>
+  <div class="card">
+    <h3>ECG Quality: <span id="ecg">--</span></h3>
+  </div>
+</div>
+
+<div id="history" class="tab" style="display:none;">
+  <h2>History</h2>
+  <div id="historyList"></div>
+</div>
+
+<div id="analytics" class="tab" style="display:none;">
+  <h2>Analytics & Trends</h2>
+
+  <div class="card">
+    <canvas id="spo2Chart"></canvas>
+  </div>
+
+  <div class="card">
+    <canvas id="tempChart"></canvas>
+  </div>
+  <div class="card">
+  <canvas id="dailyChart"></canvas>
+</div>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
