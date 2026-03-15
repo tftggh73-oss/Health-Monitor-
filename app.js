@@ -15,7 +15,7 @@ const database = firebase.database();
 let dailyChart;
 
 // ===== TAB SWITCH =====
-function showTab(tabId) {
+function showTab(tabId){
 
   document.querySelectorAll(".tab").forEach(tab=>{
     tab.style.display="none";
@@ -39,7 +39,8 @@ let spo2Chart;
 let tempChart;
 let hrChart;
 
-// ===== CREATE CHART =====
+
+// ===== CREATE REALTIME CHART =====
 window.onload=function(){
 
   const spo2Ctx=document.getElementById("spo2Chart").getContext("2d");
@@ -87,6 +88,7 @@ window.onload=function(){
 
 };
 
+
 // ===== MQTT CONFIG =====
 const host="wss://c5c491454563470fad86602d8132fcab.s1.eu.hivemq.cloud:8884/mqtt";
 
@@ -97,7 +99,8 @@ const options={
 
 const client=mqtt.connect(host,options);
 
-// ===== CONNECT =====
+
+// ===== CONNECT MQTT =====
 client.on("connect",function(){
 
   console.log("MQTT Connected");
@@ -105,6 +108,7 @@ client.on("connect",function(){
   client.subscribe("health/device01/data");
 
 });
+
 
 // ===== RECEIVE DATA =====
 client.on("message",function(topic,message){
@@ -131,6 +135,7 @@ client.on("message",function(topic,message){
   const hrEl=document.getElementById("ecg");
   hrEl.innerText=isNaN(heartRate)?"--":heartRate+" BPM";
 
+
   // ===== SAVE FIREBASE =====
   if(!isNaN(spo2)&&!isNaN(temp)&&!isNaN(heartRate)){
 
@@ -142,6 +147,7 @@ client.on("message",function(topic,message){
     });
 
   }
+
 
   // ===== HISTORY =====
   const historyList=document.getElementById("historyList");
@@ -157,7 +163,8 @@ client.on("message",function(topic,message){
 
   historyList.prepend(item);
 
-  // ===== UPDATE CHART =====
+
+  // ===== UPDATE REALTIME CHART =====
   labels.push(displayTime);
 
   spo2Data.push(isNaN(spo2)?null:spo2);
@@ -179,6 +186,7 @@ client.on("message",function(topic,message){
 
 });
 
+
 // ===== MQTT ERROR =====
 client.on("error",function(err){
 
@@ -186,7 +194,9 @@ client.on("error",function(err){
 
 });
 
-// ===== LOAD DAILY DATA =====
+
+
+// ===== LOAD DAILY DATA FROM FIREBASE =====
 function loadDailyData(){
 
   database.ref("healthData").on("value",function(snapshot){
@@ -202,40 +212,48 @@ function loadDailyData(){
       const date=item.timestamp.substring(0,10);
 
       if(!grouped[date]){
-        grouped[date]={spo2:[],temp:[]};
+        grouped[date]={spo2:[],temp:[],hr:[]};
       }
 
       grouped[date].spo2.push(Number(item.spo2));
       grouped[date].temp.push(Number(item.temperature));
+      grouped[date].hr.push(Number(item.heart_rate));
 
     });
+
 
     const dates=Object.keys(grouped).sort().slice(-3);
 
     const avgSpo2=[];
     const avgTemp=[];
+    const avgHR=[];
 
     dates.forEach(d=>{
 
       const spo2Arr=grouped[d].spo2;
       const tempArr=grouped[d].temp;
+      const hrArr=grouped[d].hr;
 
       const spo2Avg=spo2Arr.reduce((a,b)=>a+b,0)/spo2Arr.length;
       const tempAvg=tempArr.reduce((a,b)=>a+b,0)/tempArr.length;
+      const hrAvg=hrArr.reduce((a,b)=>a+b,0)/hrArr.length;
 
       avgSpo2.push(Number(spo2Avg.toFixed(1)));
       avgTemp.push(Number(tempAvg.toFixed(1)));
+      avgHR.push(Number(hrAvg.toFixed(1)));
 
     });
 
-    drawDailyChart(dates,avgSpo2,avgTemp);
+    drawDailyChart(dates,avgSpo2,avgTemp,avgHR);
 
   });
 
 }
 
-// ===== DAILY CHART =====
-function drawDailyChart(dates,spo2Data,tempData){
+
+
+// ===== DRAW DAILY AVERAGE CHART =====
+function drawDailyChart(dates,spo2Data,tempData,hrData){
 
   const canvas=document.getElementById("dailyChart");
 
@@ -254,11 +272,18 @@ function drawDailyChart(dates,spo2Data,tempData){
       datasets:[
         {
           label:"Avg SpO2",
-          data:spo2Data
+          data:spo2Data,
+          backgroundColor:"#66b3ff"
         },
         {
           label:"Avg Temperature",
-          data:tempData
+          data:tempData,
+          backgroundColor:"#ff9999"
+        },
+        {
+          label:"Avg Heart Rate",
+          data:hrData,
+          backgroundColor:"#66ff99"
         }
       ]
     }
