@@ -111,25 +111,24 @@ client.on("message",function(topic,message){
 
   const data=JSON.parse(message.toString());
 
+  console.log("MQTT DATA:",data);
+
   const timestamp=new Date().toISOString();
   const displayTime=new Date().toLocaleString();
 
-  // ===== SpO2 =====
-  const spo2El=document.getElementById("spo2");
+  // ===== READ DATA =====
   const spo2=parseFloat(data.spo2);
-
-  spo2El.innerText=isNaN(spo2)?"--":spo2;
-
-  // ===== Temperature =====
-  const tempEl=document.getElementById("temp");
   const temp=parseFloat(data.temperature);
 
-  tempEl.innerText=isNaN(temp)?"--":temp;
+  const heartRate=parseFloat(
+    data.heart_rate ?? data.bpm ?? data.hr ?? data.heartRate
+  );
 
-  // ===== Heart Rate =====
+  // ===== DISPLAY =====
+  document.getElementById("spo2").innerText=isNaN(spo2)?"--":spo2;
+  document.getElementById("temp").innerText=isNaN(temp)?"--":temp;
+
   const hrEl=document.getElementById("ecg");
-  const heartRate=parseFloat(data.heart_rate);
-
   hrEl.innerText=isNaN(heartRate)?"--":heartRate+" BPM";
 
   // ===== SAVE FIREBASE =====
@@ -161,9 +160,9 @@ client.on("message",function(topic,message){
   // ===== UPDATE CHART =====
   labels.push(displayTime);
 
-  spo2Data.push(spo2);
-  tempData.push(temp);
-  hrData.push(heartRate);
+  spo2Data.push(isNaN(spo2)?null:spo2);
+  tempData.push(isNaN(temp)?null:temp);
+  hrData.push(isNaN(heartRate)?null:heartRate);
 
   if(labels.length>20){
 
