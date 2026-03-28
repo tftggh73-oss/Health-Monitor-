@@ -13,10 +13,12 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 let dailyChart;
+let currentPatientId = null;
+let currentPatientName = "";
+let patientListenerRef = null;
 
 // ===== TAB SWITCH =====
 function showTab(tabId){
-
   document.querySelectorAll(".tab").forEach(tab=>{
     tab.style.display="none";
   });
@@ -28,7 +30,75 @@ function showTab(tabId){
   }
 
 }
+ function selectPatient(patientId, patientName){
+  currentPatientId = patientId;
+  currentPatientName = patientName;
 
+  document.getElementById("patientListPage").style.display = "none";
+  document.getElementById("patientDashboard").style.display = "block";
+
+  document.getElementById("selectedPatientName").innerText = patientName;
+  document.getElementById("selectedPatientId").innerText = "Mã bệnh nhân: " + patientId;
+
+  resetPatientUI();
+  showTab("live");
+  loadPatientHistory();
+}
+
+function goBack(){
+  if(patientListenerRef){
+    patientListenerRef.off();
+    patientListenerRef = null;
+  }
+
+  currentPatientId = null;
+  currentPatientName = "";
+
+  document.getElementById("patientDashboard").style.display = "none";
+  document.getElementById("patientListPage").style.display = "block";
+
+  resetPatientUI();
+}
+
+function resetPatientUI(){
+  document.getElementById("spo2").innerText = "--";
+  document.getElementById("temp").innerText = "--";
+  document.getElementById("ecg").innerText = "--";
+
+  document.getElementById("historyList").innerHTML = "";
+
+  document.getElementById("spo2").classList.remove("safe","warning","danger");
+  document.getElementById("temp").classList.remove("safe","warning","danger");
+  document.getElementById("ecg").classList.remove("safe","warning","danger");
+
+labels.length = 0;
+spo2Data.length = 0;
+tempData.length = 0;
+hrData.length = 0;
+
+  if(spo2Chart){
+    spo2Chart.data.labels = [];
+    spo2Chart.data.datasets[0].data = [];
+    spo2Chart.update();
+  }
+
+  if(tempChart){
+    tempChart.data.labels = [];
+    tempChart.data.datasets[0].data = [];
+    tempChart.update();
+  }
+
+  if(hrChart){
+    hrChart.data.labels = [];
+    hrChart.data.datasets[0].data = [];
+    hrChart.update();
+  }
+
+  if(dailyChart){
+    dailyChart.destroy();
+    dailyChart = null;
+  }
+}
 // ===== DATA STORAGE =====
 let labels=[];
 let spo2Data=[];
@@ -114,7 +184,7 @@ client.on("connect",function(){
 client.on("message",function(topic,message){
 
   const data=JSON.parse(message.toString());
-
+  const dataPatientId = data.patientId || "bn01";
   console.log("MQTT DATA:",data);
 
   const timestamp=new Date().toISOString();
@@ -127,6 +197,21 @@ client.on("message",function(topic,message){
   const heartRate=parseFloat(
     data.heart_rate ?? data.bpm ?? data.hr ?? data.heartRate
   );
+
+  // ===== SAVE FIREBASE =====
+  if(!isNaN(spo2)&&!isNaN(temp)&&!isNaN(heartRate)){
+    database.ref("patients/" + dataPatientId + "/healthData").push({
+      timestamp:timestamp,
+      spo2:spo2,
+      temperature:temp,
+      heart_rate:heartRate
+    });
+  }
+
+  // Chỉ cập nhật giao diện nếu đúng bệnh nhân đang chọn
+  if(!currentPatientId || dataPatientId !== currentPatientId){
+    return;
+  }
 
   // ===== SpO2 DISPLAY + COLOR =====
   const spo2El=document.getElementById("spo2");
@@ -141,7 +226,6 @@ client.on("message",function(topic,message){
     else spo2El.classList.add("danger");
   }
 
-
   // ===== TEMP DISPLAY + COLOR =====
   const tempEl=document.getElementById("temp");
 
@@ -155,7 +239,6 @@ client.on("message",function(topic,message){
     else tempEl.classList.add("danger");
   }
 
-
   // ===== HEART RATE DISPLAY + COLOR =====
   const hrEl=document.getElementById("ecg");
 
@@ -168,20 +251,6 @@ client.on("message",function(topic,message){
     else if(heartRate>=50 && heartRate<=120) hrEl.classList.add("warning");
     else hrEl.classList.add("danger");
   }
-
-
-  // ===== SAVE FIREBASE =====
-  if(!isNaN(spo2)&&!isNaN(temp)&&!isNaN(heartRate)){
-
-    database.ref("healthData").push({
-      timestamp:timestamp,
-      spo2:spo2,
-      temperature:temp,
-      heart_rate:heartRate
-    });
-
-  }
-
 
   // ===== HISTORY =====
   const historyList=document.getElementById("historyList");
@@ -197,7 +266,6 @@ client.on("message",function(topic,message){
 
   historyList.prepend(item);
 
-
   // ===== UPDATE REALTIME CHART =====
   labels.push(displayTime);
 
@@ -206,12 +274,10 @@ client.on("message",function(topic,message){
   hrData.push(isNaN(heartRate)?null:heartRate);
 
   if(labels.length>20){
-
     labels.shift();
     spo2Data.shift();
     tempData.shift();
     hrData.shift();
-
   }
 
   spo2Chart.update();
@@ -228,11 +294,110 @@ client.on("error",function(err){
 
 });
 
+function loadPatientHistory(){
+  if(!currentPatientId) return;
 
+  if(patientListenerRef){
+    patientListenerRef.off();
+  }
+
+  patientListenerRef = database.ref("patients/" + currentPatientId + "/healthData");
+
+  patientListenerRef.on("value", function(snapshot){
+    const data = snapshot.val();
+    const historyList = document.getElementById("historyList");
+
+    historyList.innerHTML = "";
+
+   labels.length = 0;
+   spo2Data.length = 0;
+   tempData.length = 0;
+   hrData.length = 0;
+
+    if(!data){
+      spo2Chart.update();
+      tempChart.update();
+      hrChart.update();
+      return;
+    }
+
+    const records = Object.values(data).sort((a,b)=> new Date(a.timestamp) - new Date(b.timestamp));
+
+    const latest20 = records.slice(-20);
+
+    latest20.forEach(item=>{
+      const displayTime = new Date(item.timestamp).toLocaleString();
+
+      labels.push(displayTime);
+      spo2Data.push(Number(item.spo2));
+      tempData.push(Number(item.temperature));
+      hrData.push(Number(item.heart_rate));
+    });
+
+    const latest = records[records.length - 1];
+    if(latest){
+      updateLatestPatient(latest);
+    }
+
+    records.slice().reverse().forEach(item=>{
+      const displayTime = new Date(item.timestamp).toLocaleString();
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <p><strong>${displayTime}</strong></p>
+        <p>SpO2: ${item.spo2}% | Temp: ${item.temperature}°C | Heart Rate: ${item.heart_rate} BPM</p>
+      `;
+      historyList.appendChild(card);
+    });
+
+    spo2Chart.update();
+    tempChart.update();
+    hrChart.update();
+  });
+}
+
+function updateLatestPatient(item){
+  const spo2 = Number(item.spo2);
+  const temp = Number(item.temperature);
+  const heartRate = Number(item.heart_rate);
+
+  const spo2El = document.getElementById("spo2");
+  const tempEl = document.getElementById("temp");
+  const hrEl = document.getElementById("ecg");
+
+  spo2El.innerText = isNaN(spo2) ? "--" : spo2;
+  tempEl.innerText = isNaN(temp) ? "--" : temp;
+  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate + " BPM";
+
+  spo2El.classList.remove("safe","warning","danger");
+  tempEl.classList.remove("safe","warning","danger");
+  hrEl.classList.remove("safe","warning","danger");
+
+  if(!isNaN(spo2)){
+    if(spo2 >= 95) spo2El.classList.add("safe");
+    else if(spo2 >= 92) spo2El.classList.add("warning");
+    else spo2El.classList.add("danger");
+  }
+
+  if(!isNaN(temp)){
+    if(temp < 37.5) tempEl.classList.add("safe");
+    else if(temp <= 37.8) tempEl.classList.add("warning");
+    else tempEl.classList.add("danger");
+  }
+
+  if(!isNaN(heartRate)){
+    if(heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
+    else if(heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
+    else hrEl.classList.add("danger");
+  }
+} 
 // ===== LOAD DAILY DATA =====
 function loadDailyData(){
 
-  database.ref("healthData").on("value",function(snapshot){
+  if(!currentPatientId) return;
+
+database.ref("patients/" + currentPatientId + "/healthData").once("value",function(snapshot){
 
     const data=snapshot.val();
 
