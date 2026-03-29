@@ -8,6 +8,7 @@ body {
 * {
   box-sizing: border-box;
 }
+
 /* ===== NAVBAR ===== */
 .navbar {
   background-color: #1e88e5;
@@ -38,6 +39,7 @@ body {
   text-align: center;
   color: #1e88e5;
 }
+
 /* ===== CARD STYLE ===== */
 .card {
   background: white;
@@ -56,7 +58,6 @@ body {
 }
 
 /* ===== VALUE COLORS FIXED ===== */
-
 .card h3 span.safe {
   color: #2e7d32 !important;
   font-weight: bold;
@@ -71,6 +72,33 @@ body {
   color: #c62828 !important;
   font-weight: bold;
 }
+
+/* ===== MÀU SẮC CHO Ô DỰ BÁO AI (NEW) ===== */
+.ai-safe { 
+  background-color: #e8f5e9; 
+  color: #2e7d32; 
+  border: 1px solid #2e7d32; 
+}
+
+.ai-warning { 
+  background-color: #fff3e0; 
+  color: #ef6c00; 
+  border: 1px solid #ef6c00; 
+}
+
+.ai-danger { 
+  background-color: #ffebee; 
+  color: #c62828; 
+  border: 1px solid #c62828; 
+  animation: pulse 2s infinite; 
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
 /* ===== PAGE HEADER ===== */
 .page-header {
   text-align: center;
@@ -122,6 +150,7 @@ body {
   margin: 0;
   color: #555;
 }
+
 /* ===== TOPBAR ===== */
 .topbar {
   display: flex;
@@ -164,6 +193,7 @@ body {
   height: 320px !important;
 }
 
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .card {
     width: 92%;
@@ -184,4 +214,3 @@ body {
     width: 92%;
   }
 }
-
