@@ -193,21 +193,6 @@ body {
   height: 320px !important;
 }
 
-.school-logo-box {
-  width: fit-content;
-  margin: 12px auto 16px;
-  background: white;
-  border: 2px solid #999;
-  text-align: center;
-  padding: 6px 10px;
-}
-
-.school-logo {
-  width: 95px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
 
 .system-title {
   text-align: center;
@@ -257,6 +242,39 @@ body {
   margin: 0;
   font-size: 16px;
   color: #1f2937;
+}
+
+.top-header {
+  position: relative;
+  width: 90%;
+  margin: 12px auto 16px;
+  min-height: 90px;
+}
+
+.school-logo-box {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: fit-content;
+  background: white;
+  border: 2px solid #999;
+  text-align: center;
+  padding: 6px 10px;
+}
+
+.school-logo {
+  width: 95px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.school-name {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #1f2937;
+  line-height: 90px;
 }
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
