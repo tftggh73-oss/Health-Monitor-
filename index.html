@@ -22,37 +22,43 @@
 
   <!-- TRANG DANH SÁCH BỆNH NHÂN -->
   <div id="patientListPage">
-    <div class="page-header">
-      <h1>Hệ thống giám sát sức khỏe</h1>
-      <p>Chọn bệnh nhân để xem thông số, lịch sử và phân tích dữ liệu</p>
+
+  <div class="school-logo-box">
+    <img src="logo-truong.png" alt="Logo trường" class="school-logo">
+  </div>
+
+  <div class="system-title">
+    <h1>HỆ THỐNG GIÁM SÁT SỨC KHỎE</h1>
+    <p>VUI LÒNG CHỌN BỆNH NHÂN GIÁM SÁT</p>
+  </div>
+
+  <div class="patient-row">
+    <div class="patient-item" onclick="selectPatient('bn01', 'Bệnh nhân A')">
+      <img src="bn1.png" alt="Bệnh nhân A" class="patient-image">
+      <p>A</p>
     </div>
 
-    <div class="patient-list">
-      <div class="patient-card" onclick="selectPatient('bn01', 'Nguyễn Văn A')">
-        <h3>Nguyễn Văn A</h3>
-        <p>Mã bệnh nhân: bn01</p>
-      </div>
-
-      <div class="patient-card" onclick="selectPatient('bn02', 'Trần Thị B')">
-        <h3>Trần Thị B</h3>
-        <p>Mã bệnh nhân: bn02</p>
-      </div>
-
-      <div class="patient-card" onclick="selectPatient('bn03', 'Lê Văn C')">
-        <h3>Lê Văn C</h3>
-        <p>Mã bệnh nhân: bn03</p>
-      </div>
-
-      <div class="patient-card" onclick="selectPatient('bn04', 'Phạm Thị D')">
-        <h3>Phạm Thị D</h3>
-        <p>Mã bệnh nhân: bn04</p>
-      </div>
-
-      <div class="patient-card" onclick="selectPatient('bn05', 'Hoàng Văn E')">
-        <h3>Hoàng Văn E</h3>
-        <p>Mã bệnh nhân: bn05</p>
-      </div>
+    <div class="patient-item" onclick="selectPatient('bn02', 'Bệnh nhân B')">
+      <img src="bn2.png" alt="Bệnh nhân B" class="patient-image">
+      <p>B</p>
     </div>
+
+    <div class="patient-item" onclick="selectPatient('bn03', 'Bệnh nhân C')">
+      <img src="bn3.png" alt="Bệnh nhân C" class="patient-image">
+      <p>C</p>
+    </div>
+
+    <div class="patient-item" onclick="selectPatient('bn04', 'Bệnh nhân D')">
+      <img src="bn4.png" alt="Bệnh nhân D" class="patient-image">
+      <p>D</p>
+    </div>
+
+    <div class="patient-item" onclick="selectPatient('bn05', 'Bệnh nhân E')">
+      <img src="bn5.png" alt="Bệnh nhân E" class="patient-image">
+      <p>E</p>
+    </div>
+  </div>
+
   </div>
 
   <!-- TRANG CHI TIẾT BỆNH NHÂN -->
