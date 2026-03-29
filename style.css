@@ -196,6 +196,7 @@ body {
 
 .system-title {
   text-align: center;
+  margin-top: 10px;
   margin-bottom: 16px;
 }
 
@@ -245,17 +246,18 @@ body {
 }
 
 .top-header {
+  width: 100%;
+  padding: 12px 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  width: 90%;
-  margin: 12px auto 16px;
-  min-height: 90px;
 }
 
 .school-logo-box {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: fit-content;
+  left: 20px;
+  top: 12px;
   background: white;
   border: 2px solid #999;
   text-align: center;
@@ -271,10 +273,13 @@ body {
 
 .school-name {
   text-align: center;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: bold;
   color: #1f2937;
-  line-height: 90px;
+}
+
+.school-name p {
+  margin: 0;
 }
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
