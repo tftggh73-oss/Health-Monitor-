@@ -194,17 +194,16 @@ body {
 }
 
 .school-logo-box {
-  width: 70%;
-  max-width: 900px;
-  margin: 20px auto 30px;
+  width: fit-content;
+  margin: 12px auto 16px;
   background: white;
   border: 2px solid #999;
   text-align: center;
-  padding: 10px;
+  padding: 6px 10px;
 }
 
 .school-logo {
-  width: 120px;
+  width: 95px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -212,12 +211,12 @@ body {
 
 .system-title {
   text-align: center;
-  margin-bottom: 35px;
+  margin-bottom: 16px;
 }
 
 .system-title h1 {
-  margin: 0 0 8px;
-  font-size: 24px;
+  margin: 0 0 2px;
+  font-size: 22px;
   color: #1e88e5;
 }
 
@@ -229,37 +228,34 @@ body {
 
 .patient-row {
   width: 90%;
-  margin: 0 auto 30px;
+  margin: 0 auto 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
-  flex-wrap: nowrap;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 34px;
 }
 
 .patient-item {
+  width: 150px;
   text-align: center;
   cursor: pointer;
 }
 
-.patient-item:hover {
-  transform: translateY(-5px);
-}
-
 .patient-image {
-  width: 140px;
-  height: 100px;
-  object-fit: cover;
+  width: 150px;
+  height: 105px;
+  object-fit: contain;
   border: 2px solid #999;
   background: white;
   display: block;
-  margin: 0 auto 10px;
-  padding: 6px;
+  margin: 0 auto 6px;
+  padding: 4px;
 }
 
 .patient-item p {
-  margin: 4px 0 0;
-  font-size: 18px;
+  margin: 0;
+  font-size: 16px;
   color: #1f2937;
 }
 /* ===== RESPONSIVE ===== */
