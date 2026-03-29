@@ -77,22 +77,22 @@ tempData.length = 0;
 hrData.length = 0;
 
   if(spo2Chart){
-    spo2Chart.data.labels = [];
-    spo2Chart.data.datasets[0].data = [];
-    spo2Chart.update();
-  }
+  spo2Chart.data.labels = labels;
+  spo2Chart.data.datasets[0].data = spo2Data;
+  spo2Chart.update();
+}
 
-  if(tempChart){
-    tempChart.data.labels = [];
-    tempChart.data.datasets[0].data = [];
-    tempChart.update();
-  }
+if(tempChart){
+  tempChart.data.labels = labels;
+  tempChart.data.datasets[0].data = tempData;
+  tempChart.update();
+}
 
-  if(hrChart){
-    hrChart.data.labels = [];
-    hrChart.data.datasets[0].data = [];
-    hrChart.update();
-  }
+if(hrChart){
+  hrChart.data.labels = labels;
+  hrChart.data.datasets[0].data = hrData;
+  hrChart.update();
+}
 
   if(dailyChart){
     dailyChart.destroy();
@@ -251,20 +251,6 @@ client.on("message",function(topic,message){
     else if(heartRate>=50 && heartRate<=120) hrEl.classList.add("warning");
     else hrEl.classList.add("danger");
   }
-
-  // ===== HISTORY =====
-  const historyList=document.getElementById("historyList");
-
-  const item=document.createElement("div");
-
-  item.className="card";
-
-  item.innerHTML=`
-  <p><strong>${displayTime}</strong></p>
-  <p>SpO2: ${spo2}% | Temp: ${temp}°C | Heart Rate: ${heartRate} BPM</p>
-  `;
-
-  historyList.prepend(item);
 
   // ===== UPDATE REALTIME CHART =====
   labels.push(displayTime);
