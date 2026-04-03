@@ -247,36 +247,6 @@ body {
 
 .top-header {
   width: 100%;
-  padding: 12px 20px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  min-height: 120px;
-  margin-bottom: 20px;
-  background: linear-gradient(90deg, #dff3ff, #bfe6ff);
-  border-bottom: 2px solid #90caf9;
-}
-
-.school-logo-box {
-  position: absolute;
-  left: 20px;
-  top: 12px;
-  padding: 6px 8px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
-.school-logo {
-  width: 95px;
-  height: auto;
-  display: block;
-}
-
-.top-header {
-  width: 100%;
   padding: 14px 20px 10px;
   display: flex;
   align-items: center;
@@ -284,18 +254,29 @@ body {
   position: relative;
   min-height: 120px;
   margin-bottom: 20px;
-  background: #0d5c91;
-  border-bottom: 3px solid #6ec1e4;
+  background: #4f8fb3;
+  border-bottom: 3px solid #9ed8f3;
+}
+
+.school-logo-box {
+  position: absolute;
+  left: 20px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  text-align: center;
+  padding: 0;
+  line-height: 0;
 }
 
 .school-name {
   text-align: center;
   font-size: 30px;
   font-weight: 800;
-  color: #d9f1ff;
-  line-height: 1.2;
+  font-family: Arial, sans-serif;
+  color: #16324a;
+  line-height: 1.15;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .school-name p {
@@ -304,9 +285,10 @@ body {
 
 .school-location {
   margin-top: 4px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
-  color: #bfe9ff;
+  font-family: Arial, sans-serif;
+  color: #1c4c6b;
 }
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
