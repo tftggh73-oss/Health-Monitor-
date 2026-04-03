@@ -136,19 +136,19 @@ body {
   align-items: center;
   gap: 15px;
   padding: 20px;
-  background: white;
+  background: #4f8fb3;
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
   flex-wrap: wrap;
 }
 
 .patient-info h2 {
   margin: 0;
-  color: #1e88e5;
+  color: #ffffff;
 }
 
 .patient-info p {
   margin: 5px 0 0;
-  color: #555;
+  color: #eaf6ff;
 }
 
 .back-btn {
