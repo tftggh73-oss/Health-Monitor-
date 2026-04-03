@@ -89,50 +89,49 @@
       </div>
     </div>
 
-    <div class="navbar">
-      <button onclick="showTab('live')">Kết quả</button>
-      <button onclick="showTab('history')">Lịch sử</button>
-      <button onclick="showTab('analytics')">Phân tích</button>
-    </div>
+   <div class="dashboard-layout">
+  <div class="sidebar">
+    <button onclick="showTab('live')">Kết quả</button>
+    <button onclick="showTab('history')">Lịch sử</button>
+    <button onclick="showTab('analytics')">Phân tích</button>
+  </div>
 
-    <!-- LIVE -->
-   <div id="live" class="tab">
-    <h2>Giám sát sức khỏe</h2>
+  <div class="content-area">
+    <div id="live" class="tab">
+      <h2>Giám sát sức khỏe</h2>
 
-    <div class="card">
+      <div class="card">
         <h3>SpO2: <span id="spo2">--</span> %</h3>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <h3>Nhiệt độ: <span id="temp">--</span> °C</h3>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <h3>Nhịp tim: <span id="ecg">--</span> BPM</h3>
-    </div>
+      </div>
 
-    <div class="card ai-card" id="ai-container" style="border: 2px solid #ccc;">
+      <div class="card ai-card" id="ai-container" style="border: 2px solid #ccc;">
         <h2 style="color: #1e88e5; font-size: 1.2rem;">DỰ BÁO TỪ AI (5 PHÚT TỚI)</h2>
         <div id="ai-status-box" style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
-            Trạng thái: <span id="ai-status">Đang phân tích...</span>
+          Trạng thái: <span id="ai-status">Đang phân tích...</span>
         </div>
         <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
-            <strong>Lời khuyên y tế:</strong>
-            <p id="ai-advice" style="font-style: italic; margin-top: 5px;">Vui lòng chờ dữ liệu...</p>
+          <strong>Lời khuyên y tế:</strong>
+          <p id="ai-advice" style="font-style: italic; margin-top: 5px;">Vui lòng chờ dữ liệu...</p>
         </div>
         <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
-            Cập nhật lúc: <span id="ai-time">--:--:--</span> | Độ rủi ro: <span id="ai-risk">0</span>%
+          Cập nhật lúc: <span id="ai-time">--:--:--</span> | Độ rủi ro: <span id="ai-risk">0</span>%
         </p>
+      </div>
     </div>
-</div>
 
-    <!-- HISTORY -->
     <div id="history" class="tab" style="display: none;">
       <h2>Lịch sử dữ liệu</h2>
       <div id="historyList"></div>
     </div>
 
-    <!-- ANALYTICS -->
     <div id="analytics" class="tab" style="display: none;">
       <h2>Phân tích xu hướng</h2>
 
@@ -152,6 +151,8 @@
         <canvas id="dailyChart"></canvas>
       </div>
     </div>
+  </div>
+</div>
 
   </div>
 
