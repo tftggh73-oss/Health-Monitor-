@@ -265,14 +265,14 @@ body {
   padding: 6px 8px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 .school-logo {
   width: 95px;
   height: auto;
   display: block;
-  margin: 0 auto;
-  background: transparent;
 }
 
 .top-header {
