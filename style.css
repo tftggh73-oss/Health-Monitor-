@@ -233,7 +233,7 @@ body {
   height: 105px;
   object-fit: contain;
   border: 2px solid #999;
-  background: white;
+  background: transparent;
   display: block;
   margin: 0 auto 6px;
   padding: 4px;
@@ -333,6 +333,4 @@ body {
   display: block;
   background: transparent !important;
 }
-body {
-  background: hotpink !important;
-}
+
