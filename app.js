@@ -111,6 +111,21 @@ function backToPatientList() {
     alert("Lưu thất bại");
   });
 } 
+
+  function loadPatientLabels() {
+  const patientIds = ["bn01", "bn02", "bn03", "bn04", "bn05"];
+
+  patientIds.forEach(patientId => {
+    database.ref("patients/" + patientId + "/profile/name").once("value", function(snapshot) {
+      const savedName = snapshot.val();
+      const label = document.getElementById("patientLabel_" + patientId);
+
+      if (savedName && label) {
+        label.innerText = savedName;
+      }
+    });
+  });
+}
 function showMeasurementTab(tabId) {
   document.querySelectorAll(".measurement-tab").forEach(tab => {
     tab.style.display = "none";
@@ -357,6 +372,7 @@ window.onload = function() {
       }]
     }
   });
+  loadPatientLabels();
 };
 
 // ===== 4. MQTT CONFIGURATION & DATA PROCESSING =====
