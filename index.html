@@ -154,11 +154,25 @@
           <h3>Chọn bệnh nhân cần lưu</h3>
 
           <div class="save-patient-list">
-            <button onclick="saveResultForPatient('bn01', 'Bệnh nhân A')">Lưu cho Bệnh nhân A</button>
-            <button onclick="saveResultForPatient('bn02', 'Bệnh nhân B')">Lưu cho Bệnh nhân B</button>
-            <button onclick="saveResultForPatient('bn03', 'Bệnh nhân C')">Lưu cho Bệnh nhân C</button>
-            <button onclick="saveResultForPatient('bn04', 'Bệnh nhân D')">Lưu cho Bệnh nhân D</button>
-            <button onclick="saveResultForPatient('bn05', 'Bệnh nhân E')">Lưu cho Bệnh nhân E</button>
+            <button onclick="saveResultForPatient('bn01', document.getElementById('patientLabel_bn01').innerText)">
+  Lưu cho <span id="saveBtnLabel_bn01">Bệnh nhân A</span>
+</button>
+
+<button onclick="saveResultForPatient('bn02', document.getElementById('patientLabel_bn02').innerText)">
+  Lưu cho <span id="saveBtnLabel_bn02">Bệnh nhân B</span>
+</button>
+
+<button onclick="saveResultForPatient('bn03', document.getElementById('patientLabel_bn03').innerText)">
+  Lưu cho <span id="saveBtnLabel_bn03">Bệnh nhân C</span>
+</button>
+
+<button onclick="saveResultForPatient('bn04', document.getElementById('patientLabel_bn04').innerText)">
+  Lưu cho <span id="saveBtnLabel_bn04">Bệnh nhân D</span>
+</button>
+
+<button onclick="saveResultForPatient('bn05', document.getElementById('patientLabel_bn05').innerText)">
+  Lưu cho <span id="saveBtnLabel_bn05">Bệnh nhân E</span>
+</button>
           </div>
         </div>
       </div>
