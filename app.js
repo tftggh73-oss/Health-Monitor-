@@ -349,6 +349,8 @@ const measureRiskEl = document.getElementById("measureRisk");
 if (measureStatusEl) measureStatusEl.innerText = data.status || "--";
 if (measureAdviceEl) measureAdviceEl.innerText = data.advice || "--";
 if (measureRiskEl) measureRiskEl.innerText = Math.round((data.risk_score || 0) * 100);
+    const measureAiTimeEl = document.getElementById("measureAiTime");
+if (measureAiTimeEl) measureAiTimeEl.innerText = data.timestamp_ai || "--:--:--";
 
     // Thay đổi màu sắc khung cảnh báo AI
     if (statusBox) {
