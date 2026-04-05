@@ -322,7 +322,7 @@ function listenToAIAlerts(patientId) {
     const riskEl = document.getElementById("ai-risk");
     const statusBox = document.getElementById("ai-status-box");
 
-   if (statusEl) statusEl.innerText = data.status;
+ if (statusEl) statusEl.innerText = data.status;
 if (adviceEl) adviceEl.innerText = data.advice;
 if (timeEl) timeEl.innerText = data.timestamp_ai;
 if (riskEl) riskEl.innerText = Math.round((data.risk_score || 0) * 100);
@@ -334,22 +334,15 @@ if (document.getElementById("infoAiStatus")) {
   document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
 }
 
-    const measureStatusEl = document.getElementById("measureAiStatus");
-    const measureAdviceEl = document.getElementById("measureAiAdvice");
-    const measureRiskEl = document.getElementById("measureRisk");
-
-if (measureStatusEl) measureStatusEl.innerText = data.status || "--";
-if (measureAdviceEl) measureAdviceEl.innerText = data.advice || "--";
-if (measureRiskEl) measureRiskEl.innerText = Math.round((data.risk_score || 0) * 100);
 // Đồng bộ AI sang trang nhận kết quả
 const measureStatusEl = document.getElementById("measureAiStatus");
 const measureAdviceEl = document.getElementById("measureAiAdvice");
 const measureRiskEl = document.getElementById("measureRisk");
+const measureAiTimeEl = document.getElementById("measureAiTime");
 
 if (measureStatusEl) measureStatusEl.innerText = data.status || "--";
 if (measureAdviceEl) measureAdviceEl.innerText = data.advice || "--";
 if (measureRiskEl) measureRiskEl.innerText = Math.round((data.risk_score || 0) * 100);
-    const measureAiTimeEl = document.getElementById("measureAiTime");
 if (measureAiTimeEl) measureAiTimeEl.innerText = data.timestamp_ai || "--:--:--";
 
     // Thay đổi màu sắc khung cảnh báo AI
