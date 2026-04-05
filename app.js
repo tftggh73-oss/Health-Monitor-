@@ -57,7 +57,56 @@ function selectPatient(patientId, patientName) {
   resetPatientUI();
   showTab("live");
   loadPatientHistory();
-  
+
+
+  function openMeasurementPage() {
+  document.getElementById("patientListPage").style.display = "none";
+  document.getElementById("patientDashboard").style.display = "none";
+  document.getElementById("measurementPage").style.display = "block";
+  showMeasurementTab("currentResult");
+}
+
+function backToPatientList() {
+  document.getElementById("measurementPage").style.display = "none";
+  document.getElementById("patientDashboard").style.display = "none";
+  document.getElementById("patientListPage").style.display = "block";
+}
+
+function showMeasurementTab(tabId) {
+  document.querySelectorAll(".measurement-tab").forEach(tab => {
+    tab.style.display = "none";
+  });
+
+  document.getElementById(tabId).style.display = "block";
+}
+
+function saveResultForPatient(patientId, patientName) {
+  const spo2 = document.getElementById("liveSpo2").innerText;
+  const temp = document.getElementById("liveTemp").innerText;
+  const hrText = document.getElementById("liveHr").innerText;
+  const time = document.getElementById("measureTime").innerText;
+
+  const hr = parseFloat(hrText);
+
+  if (spo2 === "--" || temp === "--" || hrText === "--") {
+    alert("Chưa có dữ liệu để lưu");
+    return;
+  }
+
+  database.ref("patients/" + patientId + "/healthData").push({
+    timestamp: new Date().toISOString(),
+    spo2: parseFloat(spo2),
+    temperature: parseFloat(temp),
+    heart_rate: isNaN(hr) ? hrText : hr
+  })
+  .then(() => {
+    alert("Đã lưu kết quả cho " + patientName);
+  })
+  .catch((error) => {
+    console.error("Lỗi lưu dữ liệu:", error);
+    alert("Lưu thất bại");
+  });
+}
   // Kích hoạt lắng nghe dự báo AI cho bệnh nhân này
   listenToAIAlerts(patientId);
 }
