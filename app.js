@@ -429,15 +429,41 @@ client.on("message", function(topic, message) {
 
  // Cập nhật giao diện trang "Xem kết quả đo"
 if (document.getElementById("liveSpo2")) {
-  document.getElementById("liveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
-  document.getElementById("liveTemp").innerText = isNaN(temp) ? "--" : temp;
-  document.getElementById("liveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
+  const liveSpo2El = document.getElementById("liveSpo2");
+  const liveTempEl = document.getElementById("liveTemp");
+  const liveHrEl = document.getElementById("liveHr");
+
+  liveSpo2El.innerText = isNaN(spo2) ? "--" : spo2;
+  liveTempEl.innerText = isNaN(temp) ? "--" : temp;
+  liveHrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
   document.getElementById("measureTime").innerText = displayTime;
 
   document.getElementById("saveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
   document.getElementById("saveTemp").innerText = isNaN(temp) ? "--" : temp;
   document.getElementById("saveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
   document.getElementById("saveTime").innerText = displayTime;
+
+  liveSpo2El.classList.remove("safe", "warning", "danger");
+  liveTempEl.classList.remove("safe", "warning", "danger");
+  liveHrEl.classList.remove("safe", "warning", "danger");
+
+  if (!isNaN(spo2)) {
+    if (spo2 >= 95) liveSpo2El.classList.add("safe");
+    else if (spo2 >= 92) liveSpo2El.classList.add("warning");
+    else liveSpo2El.classList.add("danger");
+  }
+
+  if (!isNaN(temp)) {
+    if (temp < 37.5) liveTempEl.classList.add("safe");
+    else if (temp <= 37.8) liveTempEl.classList.add("warning");
+    else liveTempEl.classList.add("danger");
+  }
+
+  if (!isNaN(heartRate)) {
+    if (heartRate >= 60 && heartRate <= 100) liveHrEl.classList.add("safe");
+    else if (heartRate >= 50 && heartRate <= 120) liveHrEl.classList.add("warning");
+    else liveHrEl.classList.add("danger");
+  }
 }
 
   // LƯU VÀO FIREBASE
