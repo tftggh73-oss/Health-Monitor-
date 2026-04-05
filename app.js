@@ -255,6 +255,10 @@ function resetPatientUI() {
     document.getElementById("saveTemp").innerText = "--";
     document.getElementById("saveHr").innerText = "--";
     document.getElementById("saveTime").innerText = "--:--:--";
+
+    document.getElementById("liveSpo2").classList.remove("safe", "warning", "danger");
+    document.getElementById("liveTemp").classList.remove("safe", "warning", "danger");
+    document.getElementById("liveHr").classList.remove("safe", "warning", "danger");
   }
 
   // Reset tab thông tin bệnh nhân
