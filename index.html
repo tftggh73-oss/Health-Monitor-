@@ -220,17 +220,31 @@
     <div id="info" class="tab" style="display: none;">
   <h2>Thông tin bệnh nhân</h2>
 
-  <div class="card">
-    <h3>Họ và tên: <span id="infoName">--</span></h3>
+ <div class="card info-edit-card">
+  <div class="info-row">
+    <label for="infoNameInput">Họ và tên:</label>
+    <input type="text" id="infoNameInput" placeholder="Nhập họ và tên">
   </div>
+</div>
 
-  <div class="card">
-    <h3>Tuổi: <span id="infoAge">--</span></h3>
+<div class="card info-edit-card">
+  <div class="info-row">
+    <label for="infoAgeInput">Tuổi:</label>
+    <input type="number" id="infoAgeInput" placeholder="Nhập tuổi">
   </div>
+</div>
 
-  <div class="card">
-    <h3>Giới tính: <span id="infoGender">--</span></h3>
+<div class="card info-edit-card">
+  <div class="info-row">
+    <label for="infoGenderInput">Giới tính:</label>
+    <select id="infoGenderInput">
+      <option value="">Chọn giới tính</option>
+      <option value="Nam">Nam</option>
+      <option value="Nữ">Nữ</option>
+      <option value="Khác">Khác</option>
+    </select>
   </div>
+</div>
 
   <div class="card ai-card">
     <h2 style="color: #1e88e5; font-size: 1.2rem;">KẾT QUẢ AI GẦN NHẤT</h2>
