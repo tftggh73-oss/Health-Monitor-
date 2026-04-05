@@ -72,6 +72,45 @@ function backToPatientList() {
   document.getElementById("patientListPage").style.display = "block";
 }
 
+ function savePatientInfo() {
+  if (!currentPatientId) {
+    alert("Chưa chọn bệnh nhân");
+    return;
+  }
+
+  const name = document.getElementById("infoNameInput").value.trim();
+  const age = document.getElementById("infoAgeInput").value.trim();
+  const gender = document.getElementById("infoGenderInput").value;
+
+  if (!name) {
+    alert("Vui lòng nhập họ tên");
+    return;
+  }
+
+  database.ref("patients/" + currentPatientId + "/profile").set({
+    name: name,
+    age: age,
+    gender: gender
+  })
+  .then(() => {
+    currentPatientName = name;
+
+    // cập nhật tên trên đầu dashboard
+    document.getElementById("selectedPatientName").innerText = name;
+
+    // cập nhật tên ngoài sảnh
+    const label = document.getElementById("patientLabel_" + currentPatientId);
+    if (label) {
+      label.innerText = name;
+    }
+
+    alert("Đã lưu thông tin bệnh nhân");
+  })
+  .catch((error) => {
+    console.error("Lỗi lưu thông tin:", error);
+    alert("Lưu thất bại");
+  });
+} 
 function showMeasurementTab(tabId) {
   document.querySelectorAll(".measurement-tab").forEach(tab => {
     tab.style.display = "none";
