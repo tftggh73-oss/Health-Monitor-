@@ -108,6 +108,7 @@ function saveResultForPatient(patientId, patientName) {
   });
 }
   // Kích hoạt lắng nghe dự báo AI cho bệnh nhân này
+  loadPatientInfo(patientId, patientName);
   listenToAIAlerts(patientId);
 }
 
@@ -192,8 +193,48 @@ function resetPatientUI() {
     document.getElementById("saveHr").innerText = "--";
     document.getElementById("saveTime").innerText = "--:--:--";
   }
+  if (document.getElementById("infoName")) {
+  document.getElementById("infoName").innerText = "--";
+  document.getElementById("infoAge").innerText = "--";
+  document.getElementById("infoGender").innerText = "--";
+  document.getElementById("infoAiStatus").innerText = "Đang chờ dữ liệu...";
+  document.getElementById("infoAiAdvice").innerText = "Chưa có dữ liệu AI.";
+  document.getElementById("infoAiTime").innerText = "--:--:--";
+}
 }
 
+function loadPatientInfo(patientId, patientName) {
+  document.getElementById("infoName").innerText = patientName;
+
+  // Có thể đổi tay theo từng bệnh nhân nếu chưa lưu info trên Firebase
+  const patientMap = {
+    bn01: { age: 65, gender: "Nam" },
+    bn02: { age: 58, gender: "Nữ" },
+    bn03: { age: 72, gender: "Nam" },
+    bn04: { age: 60, gender: "Nữ" },
+    bn05: { age: 67, gender: "Nam" }
+  };
+
+  const info = patientMap[patientId] || { age: "--", gender: "--" };
+
+  document.getElementById("infoAge").innerText = info.age;
+  document.getElementById("infoGender").innerText = info.gender;
+
+  database.ref("patients/" + patientId + "/alerts").once("value", function(snapshot) {
+    const data = snapshot.val();
+
+    if (!data) {
+      document.getElementById("infoAiStatus").innerText = "Chưa có dữ liệu";
+      document.getElementById("infoAiAdvice").innerText = "Chưa có kết quả AI gần nhất.";
+      document.getElementById("infoAiTime").innerText = "--:--:--";
+      return;
+    }
+
+    document.getElementById("infoAiStatus").innerText = data.status || "--";
+    document.getElementById("infoAiAdvice").innerText = data.advice || "--";
+    document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
+  });
+}
 // ===== 2. HỆ THỐNG DỰ BÁO AI =====
 
 function listenToAIAlerts(patientId) {
