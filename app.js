@@ -422,7 +422,7 @@ client.on("message", function(topic, message) {
 
   // Đọc dữ liệu số
   const spo2 = parseFloat(data.spo2);
-  const temp = parseFloat(data.temperature);
+  const temp = parseFloat(data.temperature ?? data.temp);
   const heartRate = parseFloat(
     data.heart_rate ?? data.bpm ?? data.hr ?? data.heartRate
   );
@@ -506,7 +506,7 @@ if (document.getElementById("liveSpo2")) {
 
   // Cập nhật hiển thị số & màu sắc Nhịp tim
   const hrEl = document.getElementById("ecg");
-  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate + " BPM";
+  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate ;
   hrEl.classList.remove("safe", "warning", "danger");
   if (!isNaN(heartRate)) {
     if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
@@ -611,7 +611,7 @@ function updateLatestPatient(item) {
 
   spo2El.innerText = isNaN(spo2) ? "--" : spo2;
   tempEl.innerText = isNaN(temp) ? "--" : temp;
-  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate + " BPM";
+  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate ;
 
   spo2El.classList.remove("safe", "warning", "danger");
   tempEl.classList.remove("safe", "warning", "danger");
