@@ -216,6 +216,38 @@
       </div>
     </div>
 
+
+    <div id="info" class="tab" style="display: none;">
+  <h2>Thông tin bệnh nhân</h2>
+
+  <div class="card">
+    <h3>Họ và tên: <span id="infoName">--</span></h3>
+  </div>
+
+  <div class="card">
+    <h3>Tuổi: <span id="infoAge">--</span></h3>
+  </div>
+
+  <div class="card">
+    <h3>Giới tính: <span id="infoGender">--</span></h3>
+  </div>
+
+  <div class="card ai-card">
+    <h2 style="color: #1e88e5; font-size: 1.2rem;">KẾT QUẢ AI GẦN NHẤT</h2>
+    <div style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
+      Trạng thái: <span id="infoAiStatus">Đang chờ dữ liệu...</span>
+    </div>
+
+    <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
+      <strong>Nhận xét AI:</strong>
+      <p id="infoAiAdvice" style="font-style: italic; margin-top: 5px;">Chưa có dữ liệu AI.</p>
+    </div>
+
+    <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
+      Thời gian dự đoán: <span id="infoAiTime">--:--:--</span>
+    </p>
+  </div>
+</div>
     <div id="history" class="tab" style="display: none;">
       <h2>Lịch sử dữ liệu</h2>
       <div id="historyList"></div>
