@@ -351,3 +351,66 @@ body {
     text-align: center;
   }
 }
+.measure-action {
+  text-align: center;
+  margin: 25px 0 10px;
+}
+
+.view-result-btn {
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(30, 136, 229, 0.25);
+  transition: 0.3s;
+}
+
+.view-result-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(21, 101, 192, 0.35);
+}
+
+.save-patient-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.save-patient-list button {
+  background: #1e88e5;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.save-patient-list button:hover {
+  background: #1565c0;
+}
+
+.card h3 span.safe,
+.card p span.safe {
+  color: #2e7d32 !important;
+  font-weight: bold;
+}
+
+.card h3 span.warning,
+.card p span.warning {
+  color: #f9a825 !important;
+  font-weight: bold;
+}
+
+.card h3 span.danger,
+.card p span.danger {
+  color: #c62828 !important;
+  font-weight: bold;
+}
