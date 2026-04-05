@@ -480,7 +480,14 @@ if (document.getElementById("liveSpo2")) {
   if (!currentPatientId || dataPatientId !== currentPatientId) {
     return;
   }
-
+const spo2El = document.getElementById("spo2");
+spo2El.innerText = isNaN(spo2) ? "--" : spo2;
+spo2El.classList.remove("safe", "warning", "danger");
+if (!isNaN(spo2)) {
+  if (spo2 >= 95) spo2El.classList.add("safe");
+  else if (spo2 >= 92) spo2El.classList.add("warning");
+  else spo2El.classList.add("danger");
+}
   // Cập nhật hiển thị số & màu sắc Nhiệt độ
   const tempEl = document.getElementById("temp");
   tempEl.innerText = isNaN(temp) ? "--" : temp;
