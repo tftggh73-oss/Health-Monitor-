@@ -23,149 +23,139 @@
   <!-- TRANG DANH SÁCH BỆNH NHÂN -->
   <div id="patientListPage">
 
-<!-- <div class="top-header">
-  <div class="school-logo-box">
-    <img src="logo-truong-2.png" alt="Logo trường" class="school-logo">
-  </div>
+    <div class="top-header">
+      <div class="school-logo-box">
+        <img src="logo-truong-2.png?v=1" alt="Logo trường" class="school-logo">
+      </div>
 
-  <div class="school-name">
-    <p>TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT
-                   TP.HCM</p>
-  </div>
-</div> -->
-   <div class="top-header">
-  <div class="school-logo-box">
-    <img src="logo-truong-2.png?v=1" alt="Logo trường" class="school-logo">
-  </div>
-
-  <div class="school-name">
-    <p>TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT</p>
-    <p class="school-location">TP.HCM</p>
-  </div>
-</div>
-
-<div class="system-title">
-  <h1>HỆ THỐNG GIÁM SÁT SỨC KHỎE</h1>
-  <p>VUI LÒNG CHỌN BỆNH NHÂN GIÁM SÁT</p>
-</div>
-
-  <div class="patient-row">
-    <div class="patient-item" onclick="selectPatient('bn01', document.getElementById('patientLabel_bn01').innerText)">
-      <img src="BN1.png" alt="Bệnh nhân A" class="patient-image">
-     <p id="patientLabel_bn01">A</p>
+      <div class="school-name">
+        <p>TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT</p>
+        <p class="school-location">TP.HCM</p>
+      </div>
     </div>
 
-    <div class="patient-item" onclick="selectPatient('bn02', document.getElementById('patientLabel_bn02').innerText)">
-      <img src="BN2.png" alt="Bệnh nhân B" class="patient-image">
-    <p id="patientLabel_bn02">B</p>
+    <div class="system-title">
+      <h1>HỆ THỐNG GIÁM SÁT SỨC KHỎE</h1>
+      <p>VUI LÒNG CHỌN BỆNH NHÂN GIÁM SÁT</p>
     </div>
 
-    <div class="patient-item" onclick="selectPatient('bn03', document.getElementById('patientLabel_bn03').innerText)">
-      <img src="BN3.png" alt="Bệnh nhân C" class="patient-image">
-     <p id="patientLabel_bn03">C</p>
+    <div class="patient-row">
+      <div class="patient-item" onclick="selectPatient('bn01', document.getElementById('patientLabel_bn01').innerText)">
+        <img src="BN1.png" alt="Bệnh nhân A" class="patient-image">
+        <p id="patientLabel_bn01">A</p>
+      </div>
+
+      <div class="patient-item" onclick="selectPatient('bn02', document.getElementById('patientLabel_bn02').innerText)">
+        <img src="BN2.png" alt="Bệnh nhân B" class="patient-image">
+        <p id="patientLabel_bn02">B</p>
+      </div>
+
+      <div class="patient-item" onclick="selectPatient('bn03', document.getElementById('patientLabel_bn03').innerText)">
+        <img src="BN3.png" alt="Bệnh nhân C" class="patient-image">
+        <p id="patientLabel_bn03">C</p>
+      </div>
+
+      <div class="patient-item" onclick="selectPatient('bn04', document.getElementById('patientLabel_bn04').innerText)">
+        <img src="BN4.png" alt="Bệnh nhân D" class="patient-image">
+        <p id="patientLabel_bn04">D</p>
+      </div>
+
+      <div class="patient-item" onclick="selectPatient('bn05', document.getElementById('patientLabel_bn05').innerText)">
+        <img src="BN5.png" alt="Bệnh nhân E" class="patient-image">
+        <p id="patientLabel_bn05">E</p>
+      </div>
     </div>
 
-    <div class="patient-item" onclick="selectPatient('bn04', document.getElementById('patientLabel_bn04').innerText)">
-      <img src="BN4.png" alt="Bệnh nhân D" class="patient-image">
-     <p id="patientLabel_bn04">D</p>
-    </div>
-
-    <div class="patient-item" onclick="selectPatient('bn05', document.getElementById('patientLabel_bn05').innerText)">
-      <img src="BN5.png" alt="Bệnh nhân E" class="patient-image">
-    <p id="patientLabel_bn05">E</p>
+    <div class="measure-action">
+      <button class="view-result-btn" onclick="openMeasurementPage()">Xem kết quả đo</button>
     </div>
   </div>
-   <div class="measure-action">
-  <button class="view-result-btn" onclick="openMeasurementPage()">Xem kết quả đo</button>
-</div>
-  </div>
-
-  
 
   <!-- TRANG KẾT QUẢ ĐO HIỆN TẠI -->
-<div id="measurementPage" style="display: none;">
+  <div id="measurementPage" style="display: none;">
 
-  <div class="topbar">
-    <button class="back-btn" onclick="backToPatientList()">← Quay lại</button>
-    <div class="patient-info">
-      <h2>Kết quả đo hiện tại</h2>
-      <p>Dữ liệu nhận từ thiết bị ESP32</p>
+    <div class="topbar">
+      <button class="back-btn" onclick="backToPatientList()">← Quay lại</button>
+      <div class="patient-info">
+        <h2>Kết quả đo hiện tại</h2>
+        <p>Dữ liệu nhận từ thiết bị ESP32</p>
+      </div>
+    </div>
+
+    <div class="dashboard-layout">
+      <div class="sidebar">
+        <button onclick="showMeasurementTab('currentResult')">Kết quả đo</button>
+        <button onclick="showMeasurementTab('saveResult')">Lưu kết quả</button>
+      </div>
+
+      <div class="content-area">
+
+        <!-- TAB KẾT QUẢ ĐO -->
+        <div id="currentResult" class="measurement-tab">
+          <h2>Kết quả đo từ thiết bị</h2>
+
+          <div class="card">
+            <h3>SpO2: <span id="liveSpo2">--</span> %</h3>
+          </div>
+
+          <div class="card">
+            <h3>Nhiệt độ: <span id="liveTemp">--</span> °C</h3>
+          </div>
+
+          <div class="card">
+            <h3>Nhịp tim: <span id="liveHr">--</span> BPM</h3>
+          </div>
+
+          <div class="card ai-card" style="border: 2px solid #ccc;">
+            <h2 style="color: #1e88e5; font-size: 1.2rem;">DỰ BÁO TỪ AI (5 PHÚT TỚI)</h2>
+            <div style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
+              Trạng thái: <span id="measureAiStatus">Đang chờ dữ liệu...</span>
+            </div>
+
+            <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
+              <strong>Lời khuyên y tế:</strong>
+              <p id="measureAiAdvice" style="font-style: italic; margin-top: 5px;">Vui lòng chờ dữ liệu...</p>
+            </div>
+
+            <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
+              Cập nhật lúc: <span id="measureTime">--:--:--</span> |
+              Độ rủi ro: <span id="measureRisk">0</span>%
+            </p>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <button class="view-result-btn" onclick="showMeasurementTab('saveResult')">Lưu kết quả này</button>
+          </div>
+        </div>
+
+        <!-- TAB LƯU KẾT QUẢ -->
+        <div id="saveResult" class="measurement-tab" style="display: none;">
+          <h2>Lưu kết quả cho bệnh nhân</h2>
+
+          <div class="card">
+            <p><strong>SpO2:</strong> <span id="saveSpo2">--</span> %</p>
+            <p><strong>Nhiệt độ:</strong> <span id="saveTemp">--</span> °C</p>
+            <p><strong>Nhịp tim:</strong> <span id="saveHr">--</span> BPM</p>
+            <p><strong>Thời gian đo:</strong> <span id="saveTime">--:--:--</span></p>
+          </div>
+
+          <div class="card">
+            <h3>Chọn bệnh nhân cần lưu</h3>
+
+            <div class="save-patient-list">
+              <button onclick="saveResultForPatient('bn01', document.getElementById('patientLabel_bn01').innerText)">Lưu cho <span id="saveBtnLabel_bn01">Bệnh nhân A</span></button>
+              <button onclick="saveResultForPatient('bn02', document.getElementById('patientLabel_bn02').innerText)">Lưu cho <span id="saveBtnLabel_bn02">Bệnh nhân B</span></button>
+              <button onclick="saveResultForPatient('bn03', document.getElementById('patientLabel_bn03').innerText)">Lưu cho <span id="saveBtnLabel_bn03">Bệnh nhân C</span></button>
+              <button onclick="saveResultForPatient('bn04', document.getElementById('patientLabel_bn04').innerText)">Lưu cho <span id="saveBtnLabel_bn04">Bệnh nhân D</span></button>
+              <button onclick="saveResultForPatient('bn05', document.getElementById('patientLabel_bn05').innerText)">Lưu cho <span id="saveBtnLabel_bn05">Bệnh nhân E</span></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <div class="dashboard-layout">
-    <div class="sidebar">
-      <button onclick="showMeasurementTab('currentResult')">Kết quả đo</button>
-      <button onclick="showMeasurementTab('saveResult')">Lưu kết quả</button>
-    </div>
-
-    <div class="content-area">
-      
-      <!-- TAB KẾT QUẢ ĐO -->
-      <div id="currentResult" class="measurement-tab">
-        <h2>Kết quả đo từ thiết bị</h2>
-
-        <div class="card">
-          <h3>SpO2: <span id="liveSpo2">--</span> %</h3>
-        </div>
-
-        <div class="card">
-          <h3>Nhiệt độ: <span id="liveTemp">--</span> °C</h3>
-        </div>
-
-        <div class="card">
-          <h3>Nhịp tim: <span id="liveHr">--</span> BPM</h3>
-        </div>
-
-        <div class="card ai-card" style="border: 2px solid #ccc;">
-          <h2 style="color: #1e88e5; font-size: 1.2rem;">DỰ BÁO TỪ AI (5 PHÚT TỚI)</h2>
-          <div style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
-            Trạng thái: <span id="measureAiStatus">Đang chờ dữ liệu...</span>
-          </div>
-
-          <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
-            <strong>Lời khuyên y tế:</strong>
-            <p id="measureAiAdvice" style="font-style: italic; margin-top: 5px;">Vui lòng chờ dữ liệu...</p>
-          </div>
-
-          <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
-            Cập nhật lúc: <span id="measureTime">--:--:--</span> |
-            Độ rủi ro: <span id="measureRisk">0</span>%
-          </p>
-        </div>
-
-        <div style="margin-top: 20px;">
-          <button class="view-result-btn" onclick="showMeasurementTab('saveResult')">Lưu kết quả này</button>
-        </div>
-      </div>
-
-      <!-- TAB LƯU KẾT QUẢ -->
-      <div id="saveResult" class="measurement-tab" style="display: none;">
-        <h2>Lưu kết quả cho bệnh nhân</h2>
-
-        <div class="card">
-          <p><strong>SpO2:</strong> <span id="saveSpo2">--</span> %</p>
-          <p><strong>Nhiệt độ:</strong> <span id="saveTemp">--</span> °C</p>
-          <p><strong>Nhịp tim:</strong> <span id="saveHr">--</span> BPM</p>
-          <p><strong>Thời gian đo:</strong> <span id="saveTime">--:--:--</span></p>
-        </div>
-
-        <div class="card">
-          <h3>Chọn bệnh nhân cần lưu</h3>
-
-          <div class="save-patient-list">
-            <button onclick="saveResultForPatient('bn01', 'Bệnh nhân A')">Lưu cho Bệnh nhân A</button>
-            <button onclick="saveResultForPatient('bn02', 'Bệnh nhân B')">Lưu cho Bệnh nhân B</button>
-            <button onclick="saveResultForPatient('bn03', 'Bệnh nhân C')">Lưu cho Bệnh nhân C</button>
-            <button onclick="saveResultForPatient('bn04', 'Bệnh nhân D')">Lưu cho Bệnh nhân D</button>
-            <button onclick="saveResultForPatient('bn05', 'Bệnh nhân E')">Lưu cho Bệnh nhân E</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
   <!-- TRANG CHI TIẾT BỆNH NHÂN -->
   <div id="patientDashboard" style="display: none;">
 
@@ -177,119 +167,122 @@
       </div>
     </div>
 
-   <div class="dashboard-layout">
-  <div class="sidebar">
-    <button onclick="showTab('info')">Thông tin</button>
-    <button onclick="showTab('live')">Kết quả</button>
-    <button onclick="showTab('history')">Lịch sử</button>
-    <button onclick="showTab('analytics')">Phân tích</button>
-  </div>
-
-  <div class="content-area">
-    <div id="live" class="tab">
-      <h2>Giám sát sức khỏe</h2>
-
-      <div class="card">
-        <h3>SpO2: <span id="spo2">--</span> %</h3>
+    <div class="dashboard-layout">
+      <div class="sidebar">
+        <button onclick="showTab('info')">Thông tin</button>
+        <button onclick="showTab('live')">Kết quả</button>
+        <button onclick="showTab('history')">Lịch sử</button>
+        <button onclick="showTab('analytics')">Phân tích</button>
       </div>
 
-      <div class="card">
-        <h3>Nhiệt độ: <span id="temp">--</span> °C</h3>
-      </div>
+      <div class="content-area">
 
-      <div class="card">
-        <h3>Nhịp tim: <span id="ecg">--</span> BPM</h3>
-      </div>
+        <div id="live" class="tab">
+          <h2>Giám sát sức khỏe</h2>
 
-      <div class="card ai-card" id="ai-container" style="border: 2px solid #ccc;">
-        <h2 style="color: #1e88e5; font-size: 1.2rem;">DỰ BÁO TỪ AI (5 PHÚT TỚI)</h2>
-        <div id="ai-status-box" style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
-          Trạng thái: <span id="ai-status">Đang phân tích...</span>
+          <div class="card">
+            <h3>SpO2: <span id="spo2">--</span> %</h3>
+          </div>
+
+          <div class="card">
+            <h3>Nhiệt độ: <span id="temp">--</span> °C</h3>
+          </div>
+
+          <div class="card">
+            <h3>Nhịp tim: <span id="ecg">--</span> BPM</h3>
+          </div>
+
+          <div class="card ai-card" id="ai-container" style="border: 2px solid #ccc;">
+            <h2 style="color: #1e88e5; font-size: 1.2rem;">DỰ BÁO TỪ AI (5 PHÚT TỚI)</h2>
+            <div id="ai-status-box" style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
+              Trạng thái: <span id="ai-status">Đang phân tích...</span>
+            </div>
+            <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
+              <strong>Lời khuyên y tế:</strong>
+              <p id="ai-advice" style="font-style: italic; margin-top: 5px;">Vui lòng chờ dữ liệu...</p>
+            </div>
+            <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
+              Cập nhật lúc: <span id="ai-time">--:--:--</span> | Độ rủi ro: <span id="ai-risk">0</span>%
+            </p>
+          </div>
         </div>
-        <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
-          <strong>Lời khuyên y tế:</strong>
-          <p id="ai-advice" style="font-style: italic; margin-top: 5px;">Vui lòng chờ dữ liệu...</p>
+
+        <div id="info" class="tab" style="display: none;">
+          <h2>Thông tin bệnh nhân</h2>
+
+          <div class="card info-edit-card">
+            <div class="info-row">
+              <label for="infoNameInput">Họ và tên:</label>
+              <input type="text" id="infoNameInput" placeholder="Nhập họ và tên">
+            </div>
+          </div>
+
+          <div class="card info-edit-card">
+            <div class="info-row">
+              <label for="infoAgeInput">Tuổi:</label>
+              <input type="number" id="infoAgeInput" placeholder="Nhập tuổi">
+            </div>
+          </div>
+
+          <div class="card info-edit-card">
+            <div class="info-row">
+              <label for="infoGenderInput">Giới tính:</label>
+              <select id="infoGenderInput">
+                <option value="">Chọn giới tính</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+                <option value="Khác">Khác</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="info-save-wrap">
+            <button class="save-info-btn" onclick="savePatientInfo()">Lưu</button>
+          </div>
+
+          <div class="card ai-card">
+            <h2 style="color: #1e88e5; font-size: 1.2rem;">KẾT QUẢ AI GẦN NHẤT</h2>
+            <div style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
+              Trạng thái: <span id="infoAiStatus">Đang chờ dữ liệu...</span>
+            </div>
+
+            <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
+              <strong>Nhận xét AI:</strong>
+              <p id="infoAiAdvice" style="font-style: italic; margin-top: 5px;">Chưa có dữ liệu AI.</p>
+            </div>
+
+            <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
+              Thời gian dự đoán: <span id="infoAiTime">--:--:--</span>
+            </p>
+          </div>
         </div>
-        <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
-          Cập nhật lúc: <span id="ai-time">--:--:--</span> | Độ rủi ro: <span id="ai-risk">0</span>%
-        </p>
+
+        <div id="history" class="tab" style="display: none;">
+          <h2>Lịch sử dữ liệu</h2>
+          <div id="historyList"></div>
+        </div>
+
+        <div id="analytics" class="tab" style="display: none;">
+          <h2>Phân tích xu hướng</h2>
+
+          <div class="card">
+            <canvas id="spo2Chart"></canvas>
+          </div>
+
+          <div class="card">
+            <canvas id="tempChart"></canvas>
+          </div>
+
+          <div class="card">
+            <canvas id="hrChart"></canvas>
+          </div>
+
+          <div class="card">
+            <canvas id="dailyChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
-
-
-    <div id="info" class="tab" style="display: none;">
-  <h2>Thông tin bệnh nhân</h2>
-
- <div class="card info-edit-card">
-  <div class="info-row">
-    <label for="infoNameInput">Họ và tên:</label>
-    <input type="text" id="infoNameInput" placeholder="Nhập họ và tên">
-  </div>
-</div>
-
-<div class="card info-edit-card">
-  <div class="info-row">
-    <label for="infoAgeInput">Tuổi:</label>
-    <input type="number" id="infoAgeInput" placeholder="Nhập tuổi">
-  </div>
-</div>
-
-<div class="card info-edit-card">
-  <div class="info-row">
-    <label for="infoGenderInput">Giới tính:</label>
-    <select id="infoGenderInput">
-      <option value="">Chọn giới tính</option>
-      <option value="Nam">Nam</option>
-      <option value="Nữ">Nữ</option>
-      <option value="Khác">Khác</option>
-    </select>
-  </div>
-</div>
- <div class="info-save-wrap">
-  <button class="save-info-btn" onclick="savePatientInfo()">Lưu</button>
-</div>
-  <div class="card ai-card">
-    <h2 style="color: #1e88e5; font-size: 1.2rem;">KẾT QUẢ AI GẦN NHẤT</h2>
-    <div style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold;">
-      Trạng thái: <span id="infoAiStatus">Đang chờ dữ liệu...</span>
-    </div>
-
-    <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
-      <strong>Nhận xét AI:</strong>
-      <p id="infoAiAdvice" style="font-style: italic; margin-top: 5px;">Chưa có dữ liệu AI.</p>
-    </div>
-
-    <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
-      Thời gian dự đoán: <span id="infoAiTime">--:--:--</span>
-    </p>
-  </div>
-</div>
-    <div id="history" class="tab" style="display: none;">
-      <h2>Lịch sử dữ liệu</h2>
-      <div id="historyList"></div>
-    </div>
-
-    <div id="analytics" class="tab" style="display: none;">
-      <h2>Phân tích xu hướng</h2>
-
-      <div class="card">
-        <canvas id="spo2Chart"></canvas>
-      </div>
-
-      <div class="card">
-        <canvas id="tempChart"></canvas>
-      </div>
-
-      <div class="card">
-        <canvas id="hrChart"></canvas>
-      </div>
-
-      <div class="card">
-        <canvas id="dailyChart"></canvas>
-      </div>
-    </div>
-  </div>
-</div>
 
   </div>
 
