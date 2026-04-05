@@ -115,6 +115,10 @@ function savePatientInfo() {
       label.innerText = name;
     }
 
+    const saveBtnLabel = document.getElementById("saveBtnLabel_" + currentPatientId);
+if (saveBtnLabel) {
+  saveBtnLabel.innerText = name;
+}
     alert("Đã lưu thông tin bệnh nhân");
   })
   .catch((error) => {
@@ -134,6 +138,10 @@ function loadPatientLabels() {
       if (savedName && label) {
         label.innerText = savedName;
       }
+      const saveBtnLabel = document.getElementById("saveBtnLabel_" + patientId);
+if (savedName && saveBtnLabel) {
+  saveBtnLabel.innerText = savedName;
+}
     });
   });
 }
