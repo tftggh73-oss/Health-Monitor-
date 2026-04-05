@@ -322,15 +322,20 @@ function listenToAIAlerts(patientId) {
     const riskEl = document.getElementById("ai-risk");
     const statusBox = document.getElementById("ai-status-box");
 
-    if (statusEl) statusEl.innerText = data.status;
-    if (adviceEl) adviceEl.innerText = data.advice;
-    if (timeEl) timeEl.innerText = data.timestamp_ai;
-    if (riskEl) riskEl.innerText = Math.round(data.risk_score * 100);
+    const safeStatus = data.status || data.message || "--";
+    const safeAdvice = data.advice || data.message || "Chưa có lời khuyên từ AI.";
+    const safeTime = data.timestamp_ai || "--:--:--";
+    const safeRisk = Math.round((data.risk_score || 0) * 100);
+
+    if (statusEl) statusEl.innerText = safeStatus;
+    if (adviceEl) adviceEl.innerText = safeAdvice;
+    if (timeEl) timeEl.innerText = safeTime;
+    if (riskEl) riskEl.innerText = safeRisk;
 
     // Đồng bộ AI sang tab thông tin bệnh nhân
     if (document.getElementById("infoAiStatus")) {
-      document.getElementById("infoAiStatus").innerText = data.status || "--";
-      document.getElementById("infoAiAdvice").innerText = data.advice || "--";
+      document.getElementById("infoAiStatus").innerText = data.status || data.message || "--";
+      document.getElementById("infoAiAdvice").innerText = data.advice || data.message || "Chưa có lời khuyên từ AI.";
       document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
     }
 
