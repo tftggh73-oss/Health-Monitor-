@@ -427,18 +427,18 @@ client.on("message", function(topic, message) {
     data.heart_rate ?? data.bpm ?? data.hr ?? data.heartRate
   );
 
-  // Cập nhật giao diện trang "Xem kết quả đo"
-  if (document.getElementById("liveSpo2")) {
-    document.getElementById("liveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
-    document.getElementById("liveTemp").innerText = isNaN(temp) ? "--" : temp;
-    document.getElementById("liveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
-    document.getElementById("measureTime").innerText = displayTime;
+ // Cập nhật giao diện trang "Xem kết quả đo"
+if (document.getElementById("liveSpo2")) {
+  document.getElementById("liveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
+  document.getElementById("liveTemp").innerText = isNaN(temp) ? "--" : temp;
+  document.getElementById("liveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
+  document.getElementById("measureTime").innerText = displayTime;
 
-    document.getElementById("saveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
-    document.getElementById("saveTemp").innerText = isNaN(temp) ? "--" : temp;
-    document.getElementById("saveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
-    document.getElementById("saveTime").innerText = displayTime;
-  }
+  document.getElementById("saveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
+  document.getElementById("saveTemp").innerText = isNaN(temp) ? "--" : temp;
+  document.getElementById("saveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
+  document.getElementById("saveTime").innerText = displayTime;
+}
 
   // LƯU VÀO FIREBASE
   if (!isNaN(spo2) && !isNaN(temp) && !isNaN(heartRate)) {
