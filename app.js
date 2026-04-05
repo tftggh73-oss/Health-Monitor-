@@ -306,7 +306,6 @@ function loadPatientInfo(patientId, patientName) {
 // ===== 2. HỆ THỐNG DỰ BÁO AI =====
 
 function listenToAIAlerts(patientId) {
-  // Nếu có listener cũ thì tắt đi trước
   if (aiListenerRef) aiListenerRef.off();
 
   aiListenerRef = database.ref("patients/" + patientId + "/alerts");
@@ -315,7 +314,6 @@ function listenToAIAlerts(patientId) {
     const data = snapshot.val();
     if (!data) return;
 
-    // Cập nhật các trường thông tin AI lên giao diện
     const statusEl = document.getElementById("ai-status");
     const adviceEl = document.getElementById("ai-advice");
     const timeEl = document.getElementById("ai-time");
@@ -332,14 +330,21 @@ function listenToAIAlerts(patientId) {
     if (timeEl) timeEl.innerText = safeTime;
     if (riskEl) riskEl.innerText = safeRisk;
 
-    // Đồng bộ AI sang tab thông tin bệnh nhân
+    // thêm ở đây
+    const measureStatusEl = document.getElementById("measureAiStatus");
+    const measureAdviceEl = document.getElementById("measureAiAdvice");
+    const measureRiskEl = document.getElementById("measureRisk");
+
+    if (measureStatusEl) measureStatusEl.innerText = safeStatus;
+    if (measureAdviceEl) measureAdviceEl.innerText = safeAdvice;
+    if (measureRiskEl) measureRiskEl.innerText = safeRisk;
+
     if (document.getElementById("infoAiStatus")) {
       document.getElementById("infoAiStatus").innerText = data.status || data.message || "--";
       document.getElementById("infoAiAdvice").innerText = data.advice || data.message || "Chưa có lời khuyên từ AI.";
       document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
     }
 
-    // Thay đổi màu sắc khung cảnh báo AI
     if (statusBox) {
       statusBox.classList.remove("ai-safe", "ai-warning", "ai-danger");
       if (data.status_code === 0) {
