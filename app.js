@@ -334,6 +334,13 @@ if (document.getElementById("infoAiStatus")) {
   document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
 }
 
+    const measureStatusEl = document.getElementById("measureAiStatus");
+    const measureAdviceEl = document.getElementById("measureAiAdvice");
+    const measureRiskEl = document.getElementById("measureRisk");
+
+if (measureStatusEl) measureStatusEl.innerText = data.status || "--";
+if (measureAdviceEl) measureAdviceEl.innerText = data.advice || "--";
+if (measureRiskEl) measureRiskEl.innerText = Math.round((data.risk_score || 0) * 100);
 // Đồng bộ AI sang trang nhận kết quả
 const measureStatusEl = document.getElementById("measureAiStatus");
 const measureAdviceEl = document.getElementById("measureAiAdvice");
