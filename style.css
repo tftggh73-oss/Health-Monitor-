@@ -473,3 +473,21 @@ body {
   justify-content: center;
   gap: 12px;
 }
+
+.save-info-btn {
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(21, 101, 192, 0.25);
+  transition: 0.3s;
+}
+
+.save-info-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(21, 101, 192, 0.35);
+}
