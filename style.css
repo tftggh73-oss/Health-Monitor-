@@ -321,14 +321,18 @@ body {
 .sidebar button {
   background: white;
   border: none;
-  padding: 16px 22px;  
+  padding: 16px 22px;
   cursor: pointer;
   border-radius: 14px;
   font-weight: bold;
-  font-size: 26px;    
+  font-size: 30px;
   transition: 0.3s;
-  text-align: left;
-  min-height: 56px;    
+  min-height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 .sidebar button:hover {
   background-color: #e3f2fd;
