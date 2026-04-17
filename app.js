@@ -139,7 +139,7 @@ if (saveBtnLabel) {
 }
 
 function loadPatientLabels() {
-  const patientIds = ["bn01", "bn02", "bn03", "bn04", "bn05"];
+ const patientIds = ["patient_01", "patient_02", "patient_03", "patient_04", "patient_05"];
 
   patientIds.forEach(patientId => {
     database.ref("patients/" + patientId + "/profile/name").once("value", function(snapshot) {
@@ -435,7 +435,7 @@ client.on("connect", function() {
 
 client.on("message", function(topic, message) {
   const data = JSON.parse(message.toString());
-  const dataPatientId = data.patientId || "bn01";
+  const dataPatientId = data.patientId || "patient_01";
   console.log("MQTT DATA:", data);
 
   const timestamp = new Date().toISOString();
