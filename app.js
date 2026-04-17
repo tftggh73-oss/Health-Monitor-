@@ -778,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Lỗi kết nối đến cơ sở dữ liệu.");
             }).finally(() => {
                 // Khôi phục lại trạng thái của nút bấm
-                btnXemKetQua.innerText = "Xem kết quả đo & Đánh giá AI";
+                btnXemKetQua.innerText = "Xem kết quả đo";
                 btnXemKetQua.disabled = false;
             });
         });
