@@ -717,3 +717,57 @@ function drawDailyChart(dates, spo2Data, tempData, hrData) {
     }
   });
 }
+
+// ===== 7. TÍCH HỢP XEM KẾT QUẢ ĐO AI (TỪ NHÁNH /live_result) =====
+document.addEventListener('DOMContentLoaded', () => {
+    const btnXemKetQua = document.getElementById('btn-xem-ket-qua');
+    if (btnXemKetQua) {
+        btnXemKetQua.addEventListener('click', () => {
+            
+            // Đổi text của nút để người dùng biết đang tải
+            btnXemKetQua.innerText = "Đang lấy dữ liệu AI...";
+            btnXemKetQua.disabled = true;
+
+            // Sử dụng biến 'database' (chuẩn v8) đã khởi tạo ở đầu trang thay vì module v9
+            database.ref('live_result').once('value')
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    // Hiển thị khung kết quả
+                    document.getElementById('ket-qua-box').style.display = 'block';
+
+                    // Điền dữ liệu vào các thẻ HTML tương ứng
+                    document.getElementById('val-hr').innerText = data.heart_rate;
+                    document.getElementById('val-temp').innerText = data.temperature;
+                    document.getElementById('val-spo2').innerText = data.spo2;
+                    
+                    // Điền thông điệp từ Rule-based và AI
+                    document.getElementById('val-current-status').innerText = data.current_status;
+                    document.getElementById('val-ai-advice').innerText = data.ai_prediction;
+                    document.getElementById('val-time').innerText = data.timestamp_ai;
+
+                    // Tùy chọn: Đổi màu chữ theo mức độ rủi ro (status_code: 0, 1, 2)
+                    const adviceElement = document.getElementById('val-ai-advice');
+                    if (data.status_code === 2) {
+                        adviceElement.style.color = "red";
+                    } else if (data.status_code === 1) {
+                        adviceElement.style.color = "orange";
+                    } else {
+                        adviceElement.style.color = "green";
+                    }
+
+                } else {
+                    alert("Chưa có dữ liệu dự báo nào từ hệ thống!");
+                }
+            }).catch((error) => {
+                console.error("Lỗi khi tải dữ liệu:", error);
+                alert("Lỗi kết nối đến máy chủ dữ liệu.");
+            }).finally(() => {
+                // Khôi phục lại trạng thái của nút bấm
+                btnXemKetQua.innerText = "Xem kết quả đo";
+                btnXemKetQua.disabled = false;
+            });
+        });
+    }
+});
