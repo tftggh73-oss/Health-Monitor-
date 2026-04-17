@@ -319,8 +319,9 @@ body {
 }
 
 .sidebar button {
-  background: white;
-  border: none;
+  background: linear-gradient(135deg, #ffffff, #f2f7fb);
+  border: 1px solid #c9dceb;
+  color: #0f2f4a;
   padding: 10px 16px;
   cursor: pointer;
   border-radius: 12px;
@@ -328,17 +329,27 @@ body {
   font-size: 24px;
   transition: 0.3s;
   min-height: 58px;
-  width: 100%;
+  width: 130px;
 
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
 }
 .sidebar button:hover {
-  background-color: #e3f2fd;
+  background: linear-gradient(135deg, #eaf4fb, #dceefa);
+  border-color: #8fb8d8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
 }
 
+.sidebar button.active {
+  background: linear-gradient(135deg, #d7ecfa, #bfdff5);
+  border-color: #6ea7cf;
+  color: #0b3554;
+}
 .content-area {
   flex: 1;
   padding: 20px 30px;
