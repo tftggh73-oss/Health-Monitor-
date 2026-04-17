@@ -257,9 +257,9 @@ body {
 .school-name {
   text-align: center;
   font-size: 30px;
-  font-weight: 800;
+  font-weight: 900;
   font-family: "Times New Roman", sans-serif;
-  color: #16324a;
+  color: #000;
   line-height: 1.15;
   text-transform: uppercase;
 }
@@ -270,10 +270,10 @@ body {
 
 .school-location {
   margin-top: 4px;
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 700;
   font-family: Arial, sans-serif;
-  color: #1c4c6b;
+  color: #000;
 }
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
