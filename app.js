@@ -729,25 +729,24 @@ function drawDailyChart(dates, spo2Data, tempData, hrData) {
   });
 }
 
-// ===== 7. TÍCH HỢP XEM KẾT QUẢ ĐO AI (TỪ NHÁNH /live_result) =====
+// ===== 7. TÍCH HỢP XEM KẾT QUẢ ĐO AI (TỪ NHÁNH /alerts) =====
 document.addEventListener('DOMContentLoaded', () => {
     const btnXemKetQua = document.getElementById('btn-xem-ket-qua');
-    if (btnXemKetQua) {
+    const ketQuaBox = document.getElementById('ket-qua-box');
+
+    if (btnXemKetQua && ketQuaBox) {
         btnXemKetQua.addEventListener('click', () => {
             
             // Đổi text của nút để người dùng biết đang tải
-            btnXemKetQua.innerText = "Đang lấy dữ liệu AI...";
+            btnXemKetQua.innerText = "Đang tải dữ liệu...";
             btnXemKetQua.disabled = true;
 
-            // Sử dụng biến 'database' (chuẩn v8) đã khởi tạo ở đầu trang thay vì module v9
-            database.ref('live_result').once('value')
+            // Sử dụng biến 'database' (chuẩn v8) đã khởi tạo ở đầu trang
+            database.ref('alerts').once('value')
             .then((snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     
-                    // Hiển thị khung kết quả
-                    document.getElementById('ket-qua-box').style.display = 'block';
-
                     // Điền dữ liệu vào các thẻ HTML tương ứng
                     document.getElementById('val-hr').innerText = data.heart_rate;
                     document.getElementById('val-temp').innerText = data.temperature;
@@ -758,25 +757,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('val-ai-advice').innerText = data.ai_prediction;
                     document.getElementById('val-time').innerText = data.timestamp_ai;
 
-                    // Tùy chọn: Đổi màu chữ theo mức độ rủi ro (status_code: 0, 1, 2)
-                    const adviceElement = document.getElementById('val-ai-advice');
+                    // Tùy chỉnh màu sắc dựa trên mức độ nguy hiểm (status_code từ backend)
+                    const statusEl = document.getElementById('val-ai-advice');
                     if (data.status_code === 2) {
-                        adviceElement.style.color = "red";
+                        statusEl.style.color = "red"; // Nguy hiểm
                     } else if (data.status_code === 1) {
-                        adviceElement.style.color = "orange";
+                        statusEl.style.color = "orange"; // Cảnh báo
                     } else {
-                        adviceElement.style.color = "green";
+                        statusEl.style.color = "green"; // Bình thường
                     }
 
+                    // Hiển thị khung kết quả
+                    ketQuaBox.style.display = 'block';
+
                 } else {
-                    alert("Chưa có dữ liệu dự báo nào từ hệ thống!");
+                    alert("Chưa có dữ liệu phân tích từ AI. Vui lòng chờ hệ thống thu thập đủ mẫu!");
                 }
             }).catch((error) => {
                 console.error("Lỗi khi tải dữ liệu:", error);
-                alert("Lỗi kết nối đến máy chủ dữ liệu.");
+                alert("Lỗi kết nối đến cơ sở dữ liệu.");
             }).finally(() => {
                 // Khôi phục lại trạng thái của nút bấm
-                btnXemKetQua.innerText = "Xem kết quả đo";
+                btnXemKetQua.innerText = "Xem kết quả đo & Đánh giá AI";
                 btnXemKetQua.disabled = false;
             });
         });
