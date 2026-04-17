@@ -430,7 +430,7 @@ body {
 .info-row label {
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: #23415a;
 }
 
 .info-row input,
@@ -438,6 +438,21 @@ body {
   font-size: 20px;
   padding: 8px 12px;
   min-width: 180px;
+
+  background-color: #f8fbfd;
+  color: #243447;
+  border: 1px solid #c7d6e2;
+  border-radius: 8px;
+  outline: none;
+}
+.info-row input::placeholder {
+  color: #7b8794;
+}
+
+.info-row input:focus,
+.info-row select:focus {
+  border-color: #8fb3cc;
+  box-shadow: 0 0 0 2px rgba(143, 179, 204, 0.18);
 }
 
 .info-row {
