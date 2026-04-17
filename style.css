@@ -136,7 +136,7 @@ body {
   align-items: center;
   gap: 15px;
   padding: 20px;
-  background: #4f8fb3;
+  background: #00578d;
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
   flex-wrap: wrap;
 }
@@ -304,7 +304,7 @@ body {
 
 .sidebar {
   width: 220px;
-  background: #1e88e5;
+  background: #00578d;
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
