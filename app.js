@@ -90,11 +90,22 @@ function savePatientInfo() {
   }
 
   const name = document.getElementById("infoNameInput").value.trim();
-  const age = document.getElementById("infoAgeInput").value.trim();
+  const ageValue = document.getElementById("infoAgeInput").value.trim();
   const gender = document.getElementById("infoGenderInput").value;
+  const age = Number(ageValue);
 
   if (!name) {
     alert("Vui lòng nhập họ tên");
+    return;
+  }
+
+  if (ageValue === "") {
+    alert("Vui lòng nhập tuổi");
+    return;
+  }
+
+  if (!Number.isInteger(age) || age < 0 || age > 999) {
+    alert("Tuổi phải là số nguyên từ 0 đến 999");
     return;
   }
 
