@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giám sát sức khỏe</title>
 
-  <!-- MQTT -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -20,20 +17,9 @@
 
 <body>
 
-  <!-- TRANG DANH SÁCH BỆNH NHÂN -->
   <div id="patientListPage">
 
-<!-- <div class="top-header">
-  <div class="school-logo-box">
-    <img src="logo-truong-2.png" alt="Logo trường" class="school-logo">
-  </div>
-
-  <div class="school-name">
-    <p>TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT
-                   TP.HCM</p>
-  </div>
-</div> -->
-   <div class="top-header">
+<div class="top-header">
   <div class="school-logo-box">
     <img src="Logo HCM-UTE_2.png?v=1" alt="Logo trường" class="school-logo">
   </div>
@@ -77,13 +63,39 @@
   </div>
    <div class="measure-action">
   <button class="view-result-btn" onclick="openMeasurementPage()">Xem kết quả đo</button>
-</div>
+  
+  <button id="btn-xem-ket-qua" class="view-result-btn" style="margin-top: 15px; background-color: #1e88e5;">
+      Xem kết quả đo & Đánh giá AI
+  </button>
+
+  <div id="ket-qua-box" class="card ai-card" style="display: none; margin-top: 20px; border: 2px solid #ccc; max-width: 400px; margin-left: auto; margin-right: auto;">
+      <h2 style="color: #1e88e5; font-size: 1.2rem;">Thông số sức khỏe hiện tại</h2>
+      <div style="text-align: left; padding-left: 20px;">
+          <p>❤️ Nhịp tim: <span id="val-hr" style="font-weight: bold;">--</span> bpm</p>
+          <p>🌡️ Nhiệt độ: <span id="val-temp" style="font-weight: bold;">--</span> °C</p>
+          <p>🩸 SpO2: <span id="val-spo2" style="font-weight: bold;">--</span> %</p>
+      </div>
+      
+      <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+      
+      <h2 style="color: #1e88e5; font-size: 1.2rem;">Đánh giá từ Hệ thống</h2>
+      <div style="padding: 10px; border-radius: 10px; margin-bottom: 10px; font-weight: bold; background: #fff0f0; text-align: left;">
+          <strong>Cảnh báo tức thời:</strong> <span id="val-current-status" style="color: red;">--</span>
+      </div>
+      <div style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid #1e88e5;">
+          <strong>AI Dự báo (5 phút tới):</strong>
+          <p id="val-ai-advice" style="font-style: italic; margin-top: 5px; color: blue;">--</p>
+      </div>
+      <p style="font-size: 0.8rem; color: gray; margin-top: 10px;">
+          <small>Cập nhật lần cuối: <span id="val-time">--</span></small>
+      </p>
+  </div>
+  </div>
   </div>
 
   
 
-  <!-- TRANG KẾT QUẢ ĐO HIỆN TẠI -->
-<div id="measurementPage" style="display: none;">
+  <div id="measurementPage" style="display: none;">
 
   <div class="topbar">
     <button class="back-btn" onclick="backToPatientList()">← Quay lại</button>
@@ -101,7 +113,6 @@
 
     <div class="content-area">
       
-      <!-- TAB KẾT QUẢ ĐO -->
       <div id="currentResult" class="measurement-tab">
         <h2>Kết quả đo từ thiết bị</h2>
       
@@ -139,7 +150,6 @@
         </div>
       </div>
 
-      <!-- TAB LƯU KẾT QUẢ -->
       <div id="saveResult" class="measurement-tab" style="display: none;">
         <h2>Lưu kết quả cho bệnh nhân</h2>
 
@@ -180,7 +190,6 @@
     </div>
   </div>
 </div>
-  <!-- TRANG CHI TIẾT BỆNH NHÂN -->
   <div id="patientDashboard" style="display: none;">
 
     <div class="topbar">
