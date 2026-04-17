@@ -104,8 +104,8 @@ function savePatientInfo() {
     return;
   }
 
-  if (!Number.isInteger(age) || age < 0 || age > 999) {
-    alert("Tuổi phải là số nguyên từ 0 đến 999");
+  if (!Number.isInteger(age) || age < 0 || age > 120) {
+    alert("Tuổi phải là số nguyên từ 0 đến 120");
     return;
   }
 
