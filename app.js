@@ -734,7 +734,7 @@ function updateTrendComment(dates, avgSpo2, avgTemp, avgHR) {
   else if (hrLast < hrFirst) hrText = "nhịp tim có xu hướng giảm";
   else hrText = "nhịp tim tương đối ổn định";
 
-  trendEl.innerText = `${spo2Text}, ${tempText}, ${hrText} trong 3 ngày gần nhất.`;
+  trendEl.innerText = `${spo2Text}, ${tempText}, ${hrText} trong những lần đo gần đây.`;
 }
 function drawDailyChart(dates, spo2Data, tempData, hrData) {
   const canvas = document.getElementById("dailyChart");
