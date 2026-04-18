@@ -170,17 +170,22 @@ function saveResultForPatient(patientId, patientName) {
     return;
   }
 
-  if (!latestMeasurement) {
+  const spo2Text = document.getElementById("liveSpo2")?.innerText || "--";
+  const tempText = document.getElementById("liveTemp")?.innerText || "--";
+  const hrText = document.getElementById("liveHr")?.innerText || "--";
+  const measureTime = document.getElementById("measureTime")?.innerText || "--:--:--";
+
+  if (spo2Text === "--" || tempText === "--" || hrText === "--") {
     alert("Chưa có dữ liệu đo để lưu");
     return;
   }
 
-  if (
-    latestMeasurement.spo2 === null ||
-    latestMeasurement.temperature === null ||
-    latestMeasurement.heart_rate === null
-  ) {
-    alert("Dữ liệu đo chưa đầy đủ");
+  const spo2 = parseFloat(spo2Text);
+  const temp = parseFloat(tempText);
+  const heartRate = parseFloat(hrText);
+
+  if (isNaN(spo2) || isNaN(temp) || isNaN(heartRate)) {
+    alert("Dữ liệu đo chưa hợp lệ");
     return;
   }
 
@@ -212,15 +217,20 @@ function saveResultForPatient(patientId, patientName) {
         throw new Error("INVALID_GENDER");
       }
 
+      const now = new Date();
+      const recordTimestamp =
+        latestMeasurement?.timestamp || now.toISOString();
+
       const record = {
-        timestamp: latestMeasurement.timestamp || new Date().toISOString(),
-        spo2: latestMeasurement.spo2,
-        temperature: latestMeasurement.temperature,
-        heart_rate: latestMeasurement.heart_rate,
+        timestamp: recordTimestamp,
+        spo2: spo2,
+        temperature: temp,
+        heart_rate: heartRate,
         patient_name: name,
         age: age,
         gender: gender,
-        saved_at: new Date().toISOString(),
+        saved_at: now.toISOString(),
+        measure_time: measureTime,
         source: "manual_save"
       };
 
@@ -228,16 +238,16 @@ function saveResultForPatient(patientId, patientName) {
         .then(() => {
           return database.ref("trigger_analysis").set({
             patient_id: patientId,
-            timestamp: new Date().toISOString(),
+            timestamp: now.toISOString(),
             requested_from: "web_app"
           });
         });
     })
-   .then(() => {
-  loadPatientHistory();
-  loadPatientInfo(patientId, patientName);
-  alert("Đã lưu kết quả cho " + patientName + ". AI đang phân tích...");
-})
+    .then(() => {
+      loadPatientHistory();
+      loadPatientInfo(patientId, patientName);
+      alert("Đã lưu kết quả cho " + patientName + ". AI đang phân tích...");
+    })
     .catch((error) => {
       if (
         error.message !== "NO_PROFILE" &&
