@@ -19,7 +19,7 @@ let currentPatientId = null;
 let currentPatientName = "";
 let patientListenerRef = null;
 let aiListenerRef = null; // Quản lý lắng nghe AI
-let latestMeasurement = null; // Lưu kết quả đo tạm, chỉ lưu cho bệnh nhân khi người dùng bấm nút
+
 
 // Dữ liệu cho biểu đồ Realtime
 let labels = [];
