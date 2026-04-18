@@ -264,7 +264,6 @@ function goBack() {
 
   currentPatientId = null;
   currentPatientName = "";
-  latestMeasurement = null;
 
   document.getElementById("patientDashboard").style.display = "none";
   document.getElementById("measurementPage").style.display = "none";
@@ -274,8 +273,6 @@ function goBack() {
 }
 
 function resetPatientUI() {
-  latestMeasurement = null;
-
   // Reset các chỉ số text
   document.getElementById("spo2").innerText = "--";
   document.getElementById("temp").innerText = "--";
