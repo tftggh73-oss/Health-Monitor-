@@ -120,25 +120,24 @@ function savePatientInfo() {
     age: age,
     gender: gender
   })
-  .then(() => {
-    currentPatientName = name;
+ .then(() => {
+  currentPatientName = name;
 
-    // cập nhật tên trên dashboard
-    document.getElementById("selectedPatientName").innerText = name;
+  document.getElementById("selectedPatientName").innerText = name;
 
-    // cập nhật tên ngoài sảnh
-    const label = document.getElementById("patientLabel_" + currentPatientId);
-    if (label) {
-      label.innerText = name;
-    }
+  const label = document.getElementById("patientLabel_" + currentPatientId);
+  if (label) {
+    label.innerText = name;
+  }
 
-    const saveBtnLabel = document.getElementById("saveBtnLabel_" + currentPatientId);
-    if (saveBtnLabel) {
-      saveBtnLabel.innerText = name;
-    }
+  const saveBtnLabel = document.getElementById("saveBtnLabel_" + currentPatientId);
+  if (saveBtnLabel) {
+    saveBtnLabel.innerText = name;
+  }
 
-    alert("Đã lưu thông tin bệnh nhân");
-  })
+  loadPatientInfo(currentPatientId, name);
+  alert("Đã lưu thông tin bệnh nhân");
+})
   .catch((error) => {
     console.error("Lỗi lưu thông tin:", error);
     alert("Lưu thất bại");
