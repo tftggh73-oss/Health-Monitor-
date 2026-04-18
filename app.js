@@ -227,6 +227,10 @@ function resetPatientUI() {
   document.getElementById("temp").classList.remove("safe", "warning", "danger");
   document.getElementById("ecg").classList.remove("safe", "warning", "danger");
 
+  if (document.getElementById("trendComment")) {
+  document.getElementById("trendComment").innerText = "Đang phân tích dữ liệu...";
+}
+
   // Xóa mảng dữ liệu biểu đồ
   labels.length = 0;
   spo2Data.length = 0;
@@ -692,9 +696,46 @@ function loadDailyData() {
     });
 
     drawDailyChart(dates, avgSpo2, avgTemp, avgHR);
+    updateTrendComment(dates, avgSpo2, avgTemp, avgHR);
   });
 }
 
+function updateTrendComment(dates, avgSpo2, avgTemp, avgHR) {
+  const trendEl = document.getElementById("trendComment");
+  if (!trendEl) return;
+
+  if (!dates || dates.length < 2) {
+    trendEl.innerText = "Chưa đủ dữ liệu để đánh giá xu hướng trong 3 ngày gần nhất.";
+    return;
+  }
+
+  const spo2First = avgSpo2[0];
+  const spo2Last = avgSpo2[avgSpo2.length - 1];
+
+  const tempFirst = avgTemp[0];
+  const tempLast = avgTemp[avgTemp.length - 1];
+
+  const hrFirst = avgHR[0];
+  const hrLast = avgHR[avgHR.length - 1];
+
+  let spo2Text = "";
+  let tempText = "";
+  let hrText = "";
+
+  if (spo2Last > spo2First) spo2Text = "SpO2 có xu hướng tăng";
+  else if (spo2Last < spo2First) spo2Text = "SpO2 có xu hướng giảm";
+  else spo2Text = "SpO2 tương đối ổn định";
+
+  if (tempLast > tempFirst) tempText = "nhiệt độ có xu hướng tăng";
+  else if (tempLast < tempFirst) tempText = "nhiệt độ có xu hướng giảm";
+  else tempText = "nhiệt độ tương đối ổn định";
+
+  if (hrLast > hrFirst) hrText = "nhịp tim có xu hướng tăng";
+  else if (hrLast < hrFirst) hrText = "nhịp tim có xu hướng giảm";
+  else hrText = "nhịp tim tương đối ổn định";
+
+  trendEl.innerText = `${spo2Text}, ${tempText}, ${hrText} trong 3 ngày gần nhất.`;
+}
 function drawDailyChart(dates, spo2Data, tempData, hrData) {
   const canvas = document.getElementById("dailyChart");
   if (!canvas) return;
