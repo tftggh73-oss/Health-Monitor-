@@ -510,9 +510,22 @@ client.on("message", function(topic, message) {
   const dataPatientId = data.patientId || "patient_01";
   console.log("MQTT DATA:", data);
 
-  const timestamp = data.timestamp || new Date().toISOString();
-  const displayTime = new Date().toLocaleString();
+ const now = new Date();
 
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+// ESP gửi "time":"HH:MM:SS"
+const espTime = data.time;
+
+// Tạo timestamp đầy đủ để Firebase/AI dùng
+const timestamp = espTime
+  ? `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}T${espTime}`
+  : (data.timestamp || now.toISOString());
+
+// Thời gian hiển thị trên web
+const displayTime = espTime || now.toLocaleTimeString();
   // Đọc dữ liệu số
   const spo2 = parseFloat(data.spo2);
   const temp = parseFloat(data.temperature ?? data.temp);
