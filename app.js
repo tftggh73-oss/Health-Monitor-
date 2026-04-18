@@ -442,7 +442,7 @@ client.on("message", function(topic, message) {
   const dataPatientId = data.patientId || "patient_01";
   console.log("MQTT DATA:", data);
 
-  const timestamp = new Date().toISOString();
+  const timestamp = data.timestamp || new Date().toISOString();
   const displayTime = new Date().toLocaleString();
 
   // Đọc dữ liệu số
