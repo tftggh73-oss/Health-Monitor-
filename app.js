@@ -233,9 +233,11 @@ function saveResultForPatient(patientId, patientName) {
           });
         });
     })
-    .then(() => {
-      alert("Đã lưu kết quả cho " + patientName + ". AI đang phân tích...");
-    })
+   .then(() => {
+  loadPatientHistory();
+  loadPatientInfo(patientId, patientName);
+  alert("Đã lưu kết quả cho " + patientName + ". AI đang phân tích...");
+})
     .catch((error) => {
       if (
         error.message !== "NO_PROFILE" &&
