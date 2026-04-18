@@ -161,8 +161,19 @@ function saveResultForPatient(patientId, patientName) {
   const spo2 = document.getElementById("liveSpo2").innerText;
   const temp = document.getElementById("liveTemp").innerText;
   const hrText = document.getElementById("liveHr").innerText;
-
   const hr = parseFloat(hrText);
+
+  // Lấy dữ liệu AI đang hiển thị trên giao diện
+  const aiStatus = document.getElementById("measureAiStatus")?.innerText || "--";
+  const aiAdvice = document.getElementById("measureAiAdvice")?.innerText || "Chưa có lời khuyên AI";
+  const aiRiskText = document.getElementById("measureRisk")?.innerText || "0";
+  const aiRisk = parseFloat(aiRiskText) || 0;
+
+  // Ưu tiên thời gian AI nếu có, nếu không thì lấy thời gian đo
+  const aiTime =
+    document.getElementById("ai-time")?.innerText ||
+    document.getElementById("measureTime")?.innerText ||
+    "--:--:--";
 
   if (spo2 === "--" || temp === "--" || hrText === "--") {
     alert("Chưa có dữ liệu để lưu");
@@ -173,7 +184,13 @@ function saveResultForPatient(patientId, patientName) {
     timestamp: new Date().toISOString(),
     spo2: parseFloat(spo2),
     temperature: parseFloat(temp),
-    heart_rate: isNaN(hr) ? hrText : hr
+    heart_rate: isNaN(hr) ? hrText : hr,
+
+    // Thêm dữ liệu AI
+    ai_status: aiStatus,
+    ai_advice: aiAdvice,
+    ai_risk: aiRisk,
+    ai_time: aiTime
   })
   .then(() => {
     alert("Đã lưu kết quả cho " + patientName);
@@ -602,17 +619,19 @@ function loadPatientHistory() {
     }
 
     // Hiển thị danh sách card lịch sử (mới nhất lên đầu)
-    records.slice().reverse().forEach(item => {
-      const displayTime = new Date(item.timestamp).toLocaleString();
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <p><strong>${displayTime}</strong></p>
-        <p>SpO2: ${item.spo2}% | Temp: ${item.temperature}°C | Heart Rate: ${item.heart_rate} BPM</p>
-      `;
-      historyList.appendChild(card);
-    });
-
+   records.slice().reverse().forEach(item => {
+  const displayTime = new Date(item.timestamp).toLocaleString();
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <p><strong>${displayTime}</strong></p>
+    <p>SpO2: ${item.spo2}% | Temp: ${item.temperature}°C | Heart Rate: ${item.heart_rate} BPM</p>
+    <p><strong>Trạng thái AI:</strong> ${item.ai_status || "--"} | <strong>Rủi ro:</strong> ${item.ai_risk ?? 0}%</p>
+    <p><strong>Lời khuyên AI:</strong> ${item.ai_advice || "Chưa có lời khuyên"}</p>
+    <p><strong>Thời gian AI:</strong> ${item.ai_time || "--:--:--"}</p>
+  `;
+  historyList.appendChild(card);
+});
     spo2Chart.update();
     tempChart.update();
     hrChart.update();
