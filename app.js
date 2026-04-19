@@ -35,6 +35,10 @@ let hrChart;
 // Đồng nhất hơn với logic AI:
 // SpO2: xanh >96, vàng 92-96, đỏ <92
 // Temp: xanh 36.5-37.5, vàng lệch nhẹ, đỏ lệch nặng
+// Heart Rate:
+//   Đỏ: hr > maxHr + 20 hoặc hr < minHr - 15
+//   Vàng: maxHr < hr <= maxHr + 20 hoặc minHr - 15 <= hr < minHr
+//   Xanh: minHr <= hr <= maxHr
 
 function applySpo2Color(el, spo2) {
   if (!el) return;
@@ -58,6 +62,24 @@ function applyTempColor(el, temp) {
   if (temp > 39 || temp <= 35) {
     el.classList.add("danger");
   } else if ((temp > 37.5 && temp <= 39) || (temp > 35 && temp < 36.5)) {
+    el.classList.add("warning");
+  } else {
+    el.classList.add("safe");
+  }
+}
+
+// THÊM HÀM NÀY
+function applyHrColor(el, hr, minHr = 60, maxHr = 100) {
+  if (!el) return;
+  el.classList.remove("safe", "warning", "danger");
+  if (isNaN(hr)) return;
+
+  if (hr > (maxHr + 20) || hr < (minHr - 15)) {
+    el.classList.add("danger");
+  } else if (
+    (hr > maxHr && hr <= (maxHr + 20)) ||
+    (hr >= (minHr - 15) && hr < minHr)
+  ) {
     el.classList.add("warning");
   } else {
     el.classList.add("safe");
@@ -598,12 +620,8 @@ client.on("message", function(topic, message) {
     applySpo2Color(liveSpo2El, spo2);
     applyTempColor(liveTempEl, temp);
 
-    liveHrEl.classList.remove("safe", "warning", "danger");
-    if (!isNaN(heartRate)) {
-      if (heartRate >= 60 && heartRate <= 100) liveHrEl.classList.add("safe");
-      else if (heartRate >= 50 && heartRate <= 120) liveHrEl.classList.add("warning");
-      else liveHrEl.classList.add("danger");
-    }
+    // ĐÃ SỬA CHỖ 1
+    applyHrColor(liveHrEl, heartRate);
   }
 
   if (!currentPatientId || dataPatientId !== currentPatientId) {
@@ -620,12 +638,9 @@ client.on("message", function(topic, message) {
 
   const hrEl = document.getElementById("ecg");
   hrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
-  hrEl.classList.remove("safe", "warning", "danger");
-  if (!isNaN(heartRate)) {
-    if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
-    else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
-    else hrEl.classList.add("danger");
-  }
+
+  // ĐÃ SỬA CHỖ 2
+  applyHrColor(hrEl, heartRate);
 
   labels.push(displayTime);
   spo2Data.push(isNaN(spo2) ? null : spo2);
@@ -725,12 +740,8 @@ function updateLatestPatient(item) {
   applySpo2Color(spo2El, spo2);
   applyTempColor(tempEl, temp);
 
-  hrEl.classList.remove("safe", "warning", "danger");
-  if (!isNaN(heartRate)) {
-    if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
-    else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
-    else hrEl.classList.add("danger");
-  }
+  // ĐÃ SỬA CHỖ 3
+  applyHrColor(hrEl, heartRate);
 }
 
 // ===== 6. PHÂN TÍCH DỮ LIỆU THEO NGÀY =====
