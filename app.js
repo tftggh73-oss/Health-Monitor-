@@ -915,93 +915,67 @@ function drawDailyChart(dates, spo2Data, tempData, hrData) {
   });
 }
 
-// ===== 7. TÍCH HỢP XEM KẾT QUẢ ĐO =====
-// Ưu tiên lấy bản đo mới nhất từ /healthData
-// AI thì lấy thêm từ /alerts nếu có, nhưng không để ghi đè số đo
-
+// ===== 7. TÍCH HỢP XEM KẾT QUẢ ĐO THEO AI (/alerts) =====
 document.addEventListener("DOMContentLoaded", () => {
   const btnXemKetQua = document.getElementById("btn-xem-ket-qua");
   const ketQuaBox = document.getElementById("ket-qua-box");
 
   if (btnXemKetQua && ketQuaBox) {
-    btnXemKetQua.addEventListener("click", async () => {
+    btnXemKetQua.addEventListener("click", () => {
       btnXemKetQua.innerText = "Đang tải dữ liệu...";
       btnXemKetQua.disabled = true;
 
-      try {
-        if (!currentPatientId) {
-          alert("Vui lòng chọn bệnh nhân trước");
-          return;
-        }
-
-        // 1) Lấy lịch sử đo của bệnh nhân
-        const healthSnapshot = await database
-          .ref("patients/" + currentPatientId + "/healthData")
-          .once("value");
-
-        if (!healthSnapshot.exists()) {
-          alert("Chưa có dữ liệu đo để hiển thị.");
-          return;
-        }
-
-        const healthData = healthSnapshot.val();
-        const records = Object.values(healthData).sort(
-          (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
-        );
-
-        const latestRecord = records[records.length - 1];
-
-        // 2) Hiển thị số đo từ bản ghi mới nhất
-        document.getElementById("val-hr").innerText =
-          latestRecord?.heart_rate ?? "--";
-        document.getElementById("val-temp").innerText =
-          latestRecord?.temperature ?? "--";
-        document.getElementById("val-spo2").innerText =
-          latestRecord?.spo2 ?? "--";
-
-        document.getElementById("val-time").innerText =
-          latestRecord?.measure_time ||
-          (latestRecord?.timestamp
-            ? new Date(latestRecord.timestamp).toLocaleString()
-            : "--:--:--");
-
-        // 3) Lấy AI mới nhất từ /alerts nếu có
-        const alertSnapshot = await database
-          .ref("patients/" + currentPatientId + "/alerts")
-          .once("value");
-
-        if (alertSnapshot.exists()) {
-          const alertData = alertSnapshot.val();
-
-          document.getElementById("val-current-status").innerText =
-            alertData.current_status || "--";
-
-          document.getElementById("val-ai-advice").innerText =
-            alertData.ai_prediction || alertData.advice || "--";
-
-          const statusEl = document.getElementById("val-ai-advice");
-          if (alertData.status_code === 2) {
-            statusEl.style.color = "red";
-          } else if (alertData.status_code === 1) {
-            statusEl.style.color = "orange";
-          } else {
-            statusEl.style.color = "green";
-          }
-        } else {
-          document.getElementById("val-current-status").innerText = "Chưa có";
-          document.getElementById("val-ai-advice").innerText =
-            "Chưa có kết quả AI cho lần đo này.";
-          document.getElementById("val-ai-advice").style.color = "";
-        }
-
-        ketQuaBox.style.display = "block";
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
-        alert("Lỗi kết nối đến cơ sở dữ liệu.");
-      } finally {
+      if (!currentPatientId) {
+        alert("Vui lòng chọn bệnh nhân trước");
         btnXemKetQua.innerText = "Xem kết quả đo";
         btnXemKetQua.disabled = false;
+        return;
       }
+
+      database.ref("patients/" + currentPatientId + "/alerts").once("value")
+        .then((snapshot) => {
+          if (!snapshot.exists()) {
+            alert("Chưa có dữ liệu AI. Vui lòng lưu kết quả đo trước.");
+            return;
+          }
+
+          const data = snapshot.val();
+
+          // Số đo lấy theo AI
+          document.getElementById("val-hr").innerText = data.heart_rate ?? "--";
+          document.getElementById("val-temp").innerText = data.temperature ?? "--";
+          document.getElementById("val-spo2").innerText = data.spo2 ?? "--";
+
+          // Nội dung AI
+          document.getElementById("val-current-status").innerText =
+            data.current_status || data.status || "--";
+
+          document.getElementById("val-ai-advice").innerText =
+            data.advice || data.ai_prediction || "--";
+
+          document.getElementById("val-time").innerText =
+            data.timestamp_ai || "--:--:--";
+
+          // Màu cảnh báo AI
+          const adviceEl = document.getElementById("val-ai-advice");
+          if (data.status_code === 2) {
+            adviceEl.style.color = "red";
+          } else if (data.status_code === 1) {
+            adviceEl.style.color = "orange";
+          } else {
+            adviceEl.style.color = "green";
+          }
+
+          ketQuaBox.style.display = "block";
+        })
+        .catch((error) => {
+          console.error("Lỗi khi tải dữ liệu AI:", error);
+          alert("Lỗi kết nối đến cơ sở dữ liệu.");
+        })
+        .finally(() => {
+          btnXemKetQua.innerText = "Xem kết quả đo";
+          btnXemKetQua.disabled = false;
+        });
     });
   }
 });
