@@ -541,7 +541,6 @@ client.on("connect", function() {
 
 client.on("message", function(topic, message) {
   const data = JSON.parse(message.toString());
-  const dataPatientId = data.patientId || "patient_01";
   console.log("MQTT DATA:", data);
 
   const now = new Date();
@@ -571,6 +570,7 @@ client.on("message", function(topic, message) {
     heart_rate: isNaN(heartRate) ? null : heartRate
   };
 
+  // Luồng dữ liệu thô chung cho AI
   if (!isNaN(spo2) && !isNaN(temp) && !isNaN(heartRate)) {
     database.ref("healthData").push({
       timestamp: timestamp,
@@ -580,6 +580,7 @@ client.on("message", function(topic, message) {
     });
   }
 
+  // Chỉ cập nhật trang đo hiện tại
   if (document.getElementById("liveSpo2")) {
     const liveSpo2El = document.getElementById("liveSpo2");
     const liveTempEl = document.getElementById("liveTemp");
@@ -606,43 +607,10 @@ client.on("message", function(topic, message) {
     }
   }
 
-  if (!currentPatientId || dataPatientId !== currentPatientId) {
-    return;
-  }
-
-  const spo2El = document.getElementById("spo2");
-  spo2El.innerText = isNaN(spo2) ? "--" : spo2;
-  applySpo2Color(spo2El, spo2);
-
-  const tempEl = document.getElementById("temp");
-  tempEl.innerText = isNaN(temp) ? "--" : temp;
-  applyTempColor(tempEl, temp);
-
-  const hrEl = document.getElementById("ecg");
-  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
-  hrEl.classList.remove("safe", "warning", "danger");
-  if (!isNaN(heartRate)) {
-    if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
-    else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
-    else hrEl.classList.add("danger");
-  }
-
-  labels.push(displayTime);
-  spo2Data.push(isNaN(spo2) ? null : spo2);
-  tempData.push(isNaN(temp) ? null : temp);
-  hrData.push(isNaN(heartRate) ? null : heartRate);
-
-  if (labels.length > 20) {
-    labels.shift();
-    spo2Data.shift();
-    tempData.shift();
-    hrData.shift();
-  }
-
-  spo2Chart.update();
-  tempChart.update();
-  hrChart.update();
+  // KHÔNG cập nhật trực tiếp dashboard bệnh nhân ở đây nữa
+  // Dashboard chỉ lấy từ /patients/{patientId}/healthData khi đã lưu
 });
+
 
 client.on("error", function(err) {
   console.log("MQTT Error:", err);
