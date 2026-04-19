@@ -44,51 +44,6 @@ function applyTempColor(el, temp) {
     el.classList.add("safe");
   }
 }
-
-function normalizeGender(gender) {
-  const g = String(gender || "").trim().toLowerCase();
-  if (["nam", "male", "m", "1"].includes(g)) return "nam";
-  if (["nữ", "nu", "female", "f", "0"].includes(g)) return "nu";
-  return "nam";
-}
-
-function getHrBounds(age, gender) {
-  const g = normalizeGender(gender);
-  const isMale = g === "nam";
-
-  let a = parseInt(age, 10);
-  if (isNaN(a)) a = 25;
-
-  if (a < 1) return isMale ? { min: 102, max: 155 } : { min: 104, max: 156 };
-  if (a === 1) return isMale ? { min: 95, max: 137 } : { min: 95, max: 139 };
-  if (a >= 2 && a <= 3) return isMale ? { min: 85, max: 124 } : { min: 88, max: 125 };
-  if (a >= 4 && a <= 5) return isMale ? { min: 74, max: 112 } : { min: 76, max: 117 };
-  if (a >= 6 && a <= 8) return isMale ? { min: 66, max: 105 } : { min: 69, max: 106 };
-  if (a >= 9 && a <= 11) return isMale ? { min: 61, max: 97 } : { min: 66, max: 103 };
-  if (a >= 12 && a <= 15) return isMale ? { min: 57, max: 97 } : { min: 60, max: 99 };
-  if (a >= 16 && a <= 19) return isMale ? { min: 52, max: 92 } : { min: 58, max: 99 };
-  if (a >= 20 && a <= 39) return isMale ? { min: 52, max: 89 } : { min: 57, max: 95 };
-  if (a >= 40 && a <= 59) return isMale ? { min: 52, max: 90 } : { min: 56, max: 92 };
-  if (a >= 60 && a <= 79) return isMale ? { min: 50, max: 91 } : { min: 56, max: 92 };
-  return isMale ? { min: 51, max: 94 } : { min: 56, max: 93 };
-}
-
-function applyHrColor(el, heartRate, age = 25, gender = "Nam") {
-  if (!el) return;
-  el.classList.remove("safe", "warning", "danger");
-  if (isNaN(heartRate)) return;
-
-  const { min, max } = getHrBounds(age, gender);
-
-  if (heartRate < (min - 15) || heartRate > (max + 20)) {
-    el.classList.add("danger");
-  } else if (heartRate < min || heartRate > max) {
-    el.classList.add("warning");
-  } else {
-    el.classList.add("safe");
-  }
-}
-
 // Dữ liệu cho biểu đồ Realtime
 let labels = [];
 let spo2Data = [];
@@ -586,23 +541,22 @@ client.on("message", function(topic, message) {
   const dataPatientId = data.patientId || "patient_01";
   console.log("MQTT DATA:", data);
 
-  const now = new Date();
+ const now = new Date();
 
-  function pad2(n) {
-    return String(n).padStart(2, "0");
-  }
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
 
-  // ESP gửi "time":"HH:MM:SS"
-  const espTime = data.time;
+// ESP gửi "time":"HH:MM:SS"
+const espTime = data.time;
 
-  // Tạo timestamp đầy đủ để Firebase/AI dùng
-  const timestamp = espTime
-    ? `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}T${espTime}`
-    : (data.timestamp || now.toISOString());
+// Tạo timestamp đầy đủ để Firebase/AI dùng
+const timestamp = espTime
+  ? `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}T${espTime}`
+  : (data.timestamp || now.toISOString());
 
-  // Thời gian hiển thị trên web
-  const displayTime = espTime || now.toLocaleTimeString();
-
+// Thời gian hiển thị trên web
+const displayTime = espTime || now.toLocaleTimeString();
   // Đọc dữ liệu số
   const spo2 = parseFloat(data.spo2);
   const temp = parseFloat(data.temperature ?? data.temp);
@@ -644,12 +598,27 @@ client.on("message", function(topic, message) {
     document.getElementById("saveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
     document.getElementById("saveTime").innerText = displayTime;
 
-    const ageNow = parseInt(document.getElementById("infoAgeInput")?.value, 10) || 25;
-    const genderNow = document.getElementById("infoGenderInput")?.value || "Nam";
+    liveSpo2El.classList.remove("safe", "warning", "danger");
+    liveTempEl.classList.remove("safe", "warning", "danger");
+    liveHrEl.classList.remove("safe", "warning", "danger");
 
-    applySpo2Color(liveSpo2El, spo2);
-    applyTempColor(liveTempEl, temp);
-    applyHrColor(liveHrEl, heartRate, ageNow, genderNow);
+    if (!isNaN(spo2)) {
+      if (spo2 >= 96) liveSpo2El.classList.add("safe");
+      else if (spo2 >= 92) liveSpo2El.classList.add("warning");
+      else liveSpo2El.classList.add("danger");
+    }
+
+    if (!isNaN(temp)) {
+      if (temp < 37.5) liveTempEl.classList.add("safe");
+      else if (temp <= 37.8) liveTempEl.classList.add("warning");
+      else liveTempEl.classList.add("danger");
+    }
+
+    if (!isNaN(heartRate)) {
+      if (heartRate >= 60 && heartRate <= 100) liveHrEl.classList.add("safe");
+      else if (heartRate >= 50 && heartRate <= 120) liveHrEl.classList.add("warning");
+      else liveHrEl.classList.add("danger");
+    }
   }
 
   // Cập nhật giao diện nếu đang xem đúng bệnh nhân
@@ -659,20 +628,32 @@ client.on("message", function(topic, message) {
 
   const spo2El = document.getElementById("spo2");
   spo2El.innerText = isNaN(spo2) ? "--" : spo2;
-  applySpo2Color(spo2El, spo2);
+  spo2El.classList.remove("safe", "warning", "danger");
+  if (!isNaN(spo2)) {
+    if (spo2 >= 95) spo2El.classList.add("safe");
+    else if (spo2 >= 92) spo2El.classList.add("warning");
+    else spo2El.classList.add("danger");
+  }
 
   // Cập nhật hiển thị số & màu sắc Nhiệt độ
   const tempEl = document.getElementById("temp");
   tempEl.innerText = isNaN(temp) ? "--" : temp;
-  applyTempColor(tempEl, temp);
+  tempEl.classList.remove("safe", "warning", "danger");
+  if (!isNaN(temp)) {
+    if (temp < 37.5) tempEl.classList.add("safe");
+    else if (temp <= 37.8) tempEl.classList.add("warning");
+    else tempEl.classList.add("danger");
+  }
 
   // Cập nhật hiển thị số & màu sắc Nhịp tim
   const hrEl = document.getElementById("ecg");
   hrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
-
-  const ageNow = parseInt(document.getElementById("infoAgeInput")?.value, 10) || 25;
-  const genderNow = document.getElementById("infoGenderInput")?.value || "Nam";
-  applyHrColor(hrEl, heartRate, ageNow, genderNow);
+  hrEl.classList.remove("safe", "warning", "danger");
+  if (!isNaN(heartRate)) {
+    if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
+    else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
+    else hrEl.classList.add("danger");
+  }
 
   // Cập nhật biểu đồ Realtime (giới hạn 20 điểm dữ liệu)
   labels.push(displayTime);
@@ -773,12 +754,27 @@ function updateLatestPatient(item) {
   tempEl.innerText = isNaN(temp) ? "--" : temp;
   hrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
 
-  const age = item.age || parseInt(document.getElementById("infoAgeInput")?.value, 10) || 25;
-  const gender = item.gender || document.getElementById("infoGenderInput")?.value || "Nam";
+  spo2El.classList.remove("safe", "warning", "danger");
+  tempEl.classList.remove("safe", "warning", "danger");
+  hrEl.classList.remove("safe", "warning", "danger");
 
-  applySpo2Color(spo2El, spo2);
-  applyTempColor(tempEl, temp);
-  applyHrColor(hrEl, heartRate, age, gender);
+  if (!isNaN(spo2)) {
+    if (spo2 >= 95) spo2El.classList.add("safe");
+    else if (spo2 >= 92) spo2El.classList.add("warning");
+    else spo2El.classList.add("danger");
+  }
+
+  if (!isNaN(temp)) {
+    if (temp < 37.5) tempEl.classList.add("safe");
+    else if (temp <= 37.8) tempEl.classList.add("warning");
+    else tempEl.classList.add("danger");
+  }
+
+  if (!isNaN(heartRate)) {
+    if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
+    else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
+    else hrEl.classList.add("danger");
+  }
 }
 
 // ===== 6. PHÂN TÍCH DỮ LIỆU THEO NGÀY =====
