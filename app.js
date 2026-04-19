@@ -35,10 +35,6 @@ let hrChart;
 // Đồng nhất hơn với logic AI:
 // SpO2: xanh >96, vàng 92-96, đỏ <92
 // Temp: xanh 36.5-37.5, vàng lệch nhẹ, đỏ lệch nặng
-// Heart Rate:
-//   Đỏ: hr > maxHr + 20 hoặc hr < minHr - 15
-//   Vàng: maxHr < hr <= maxHr + 20 hoặc minHr - 15 <= hr < minHr
-//   Xanh: minHr <= hr <= maxHr
 
 function applySpo2Color(el, spo2) {
   if (!el) return;
@@ -68,11 +64,71 @@ function applyTempColor(el, temp) {
   }
 }
 
-// THÊM HÀM NÀY
-function applyHrColor(el, hr, minHr = 60, maxHr = 100) {
+function getHrRangeByAgeGender(age, gender) {
+  const ranges = [
+    { minAge: 0, maxAge: 0, male: { min: 102, max: 155 }, female: { min: 104, max: 156 } },
+    { minAge: 1, maxAge: 1, male: { min: 95, max: 137 }, female: { min: 95, max: 139 } },
+    { minAge: 2, maxAge: 3, male: { min: 85, max: 124 }, female: { min: 88, max: 125 } },
+    { minAge: 4, maxAge: 5, male: { min: 74, max: 112 }, female: { min: 76, max: 117 } },
+    { minAge: 6, maxAge: 8, male: { min: 66, max: 105 }, female: { min: 69, max: 106 } },
+    { minAge: 9, maxAge: 11, male: { min: 61, max: 97 }, female: { min: 66, max: 103 } },
+    { minAge: 12, maxAge: 15, male: { min: 57, max: 97 }, female: { min: 60, max: 99 } },
+    { minAge: 16, maxAge: 19, male: { min: 52, max: 92 }, female: { min: 58, max: 99 } },
+    { minAge: 20, maxAge: 39, male: { min: 52, max: 89 }, female: { min: 57, max: 95 } },
+    { minAge: 40, maxAge: 59, male: { min: 52, max: 90 }, female: { min: 56, max: 92 } },
+    { minAge: 60, maxAge: 79, male: { min: 50, max: 91 }, female: { min: 56, max: 92 } },
+    { minAge: 80, maxAge: 200, male: { min: 51, max: 94 }, female: { min: 56, max: 93 } }
+  ];
+
+  const normalizedGender = String(gender || "").trim().toLowerCase();
+  const isFemale =
+    normalizedGender === "nữ" ||
+    normalizedGender === "nu" ||
+    normalizedGender === "female" ||
+    normalizedGender === "f";
+
+  const isMale =
+    normalizedGender === "nam" ||
+    normalizedGender === "male" ||
+    normalizedGender === "m";
+
+  const safeAge = Number(age);
+
+  if (!Number.isFinite(safeAge) || safeAge < 0) {
+    return { min: 60, max: 100 };
+  }
+
+  const matched = ranges.find(r => safeAge >= r.minAge && safeAge <= r.maxAge);
+
+  if (!matched) {
+    return { min: 60, max: 100 };
+  }
+
+  if (isFemale) return matched.female;
+  if (isMale) return matched.male;
+
+  return { min: 60, max: 100 };
+}
+
+function getCurrentPatientHrRange() {
+  const ageInput = document.getElementById("infoAgeInput");
+  const genderInput = document.getElementById("infoGenderInput");
+
+  const age = Number(ageInput?.value);
+  const gender = genderInput?.value || "";
+
+  return getHrRangeByAgeGender(age, gender);
+}
+
+function applyHrColorByProfile(el, hr) {
   if (!el) return;
+
   el.classList.remove("safe", "warning", "danger");
   if (isNaN(hr)) return;
+
+  const range = getCurrentPatientHrRange();
+  const minHr = range.min;
+  const maxHr = range.max;
 
   if (hr > (maxHr + 20) || hr < (minHr - 15)) {
     el.classList.add("danger");
@@ -621,7 +677,7 @@ client.on("message", function(topic, message) {
     applyTempColor(liveTempEl, temp);
 
     // ĐÃ SỬA CHỖ 1
-    applyHrColor(liveHrEl, heartRate);
+    applyHrColorByProfile(liveHrEl, heartRate);
   }
 
   if (!currentPatientId || dataPatientId !== currentPatientId) {
@@ -640,7 +696,7 @@ client.on("message", function(topic, message) {
   hrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
 
   // ĐÃ SỬA CHỖ 2
-  applyHrColor(hrEl, heartRate);
+  applyHrColorByProfile(hrEl, heartRate);
 
   labels.push(displayTime);
   spo2Data.push(isNaN(spo2) ? null : spo2);
@@ -741,7 +797,7 @@ function updateLatestPatient(item) {
   applyTempColor(tempEl, temp);
 
   // ĐÃ SỬA CHỖ 3
-  applyHrColor(hrEl, heartRate);
+  applyHrColorByProfile(hrEl, heartRate);
 }
 
 // ===== 6. PHÂN TÍCH DỮ LIỆU THEO NGÀY =====
