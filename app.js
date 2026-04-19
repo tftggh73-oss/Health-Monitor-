@@ -19,7 +19,6 @@ let currentPatientId = null;
 let currentPatientName = "";
 let patientListenerRef = null;
 let aiListenerRef = null; // Quản lý lắng nghe AI
-let latestMeasurement = null;
 
 // Dữ liệu cho biểu đồ Realtime
 let labels = [];
@@ -30,39 +29,6 @@ let hrData = [];
 let spo2Chart;
 let tempChart;
 let hrChart;
-
-// ===== HÀM DÙNG CHUNG CHO MÀU SẮC =====
-// Đồng nhất hơn với logic AI:
-// SpO2: xanh >96, vàng 92-96, đỏ <92
-// Temp: xanh 36.5-37.5, vàng lệch nhẹ, đỏ lệch nặng
-
-function applySpo2Color(el, spo2) {
-  if (!el) return;
-  el.classList.remove("safe", "warning", "danger");
-  if (isNaN(spo2)) return;
-
-  if (spo2 > 96) {
-    el.classList.add("safe");
-  } else if (spo2 >= 92) {
-    el.classList.add("warning");
-  } else {
-    el.classList.add("danger");
-  }
-}
-
-function applyTempColor(el, temp) {
-  if (!el) return;
-  el.classList.remove("safe", "warning", "danger");
-  if (isNaN(temp)) return;
-
-  if (temp > 39 || temp <= 35) {
-    el.classList.add("danger");
-  } else if ((temp > 37.5 && temp <= 39) || (temp > 35 && temp < 36.5)) {
-    el.classList.add("warning");
-  } else {
-    el.classList.add("safe");
-  }
-}
 
 // ===== 1. HỆ THỐNG TAB & ĐIỀU HƯỚNG =====
 
@@ -143,11 +109,6 @@ function savePatientInfo() {
     return;
   }
 
-  if (!gender) {
-    alert("Vui lòng chọn giới tính");
-    return;
-  }
-
   database.ref("patients/" + currentPatientId + "/profile").set({
     name: name,
     age: age,
@@ -156,19 +117,19 @@ function savePatientInfo() {
   .then(() => {
     currentPatientName = name;
 
+    // cập nhật tên trên dashboard
     document.getElementById("selectedPatientName").innerText = name;
 
+    // cập nhật tên ngoài sảnh
     const label = document.getElementById("patientLabel_" + currentPatientId);
     if (label) {
       label.innerText = name;
     }
 
     const saveBtnLabel = document.getElementById("saveBtnLabel_" + currentPatientId);
-    if (saveBtnLabel) {
-      saveBtnLabel.innerText = name;
-    }
-
-    loadPatientInfo(currentPatientId, name);
+if (saveBtnLabel) {
+  saveBtnLabel.innerText = name;
+}
     alert("Đã lưu thông tin bệnh nhân");
   })
   .catch((error) => {
@@ -178,7 +139,7 @@ function savePatientInfo() {
 }
 
 function loadPatientLabels() {
-  const patientIds = ["patient_01", "patient_02", "patient_03", "patient_04", "patient_05"];
+ const patientIds = ["patient_01", "patient_02", "patient_03", "patient_04", "patient_05"];
 
   patientIds.forEach(patientId => {
     database.ref("patients/" + patientId + "/profile/name").once("value", function(snapshot) {
@@ -188,112 +149,60 @@ function loadPatientLabels() {
       if (savedName && label) {
         label.innerText = savedName;
       }
-
       const saveBtnLabel = document.getElementById("saveBtnLabel_" + patientId);
-      if (savedName && saveBtnLabel) {
-        saveBtnLabel.innerText = savedName;
-      }
+if (savedName && saveBtnLabel) {
+  saveBtnLabel.innerText = savedName;
+}
     });
   });
 }
 
 function saveResultForPatient(patientId, patientName) {
-  if (!patientId) {
-    alert("Chưa chọn bệnh nhân");
+  const spo2 = document.getElementById("liveSpo2").innerText;
+  const temp = document.getElementById("liveTemp").innerText;
+  const hrText = document.getElementById("liveHr").innerText;
+  const hr = parseFloat(hrText);
+
+  // Lấy dữ liệu AI đang hiển thị trên giao diện
+  const aiStatus = document.getElementById("measureAiStatus")?.innerText || "--";
+  const aiAdvice = document.getElementById("measureAiAdvice")?.innerText || "Chưa có lời khuyên AI";
+  const aiRiskText = document.getElementById("measureRisk")?.innerText || "0";
+  const aiRisk = parseFloat(aiRiskText) || 0;
+
+  // Ưu tiên thời gian AI nếu có, nếu không thì lấy thời gian đo
+  const aiTime =
+    document.getElementById("ai-time")?.innerText ||
+    document.getElementById("measureTime")?.innerText ||
+    "--:--:--";
+
+  if (spo2 === "--" || temp === "--" || hrText === "--") {
+    alert("Chưa có dữ liệu để lưu");
     return;
   }
 
-  const spo2Text = document.getElementById("liveSpo2")?.innerText || "--";
-  const tempText = document.getElementById("liveTemp")?.innerText || "--";
-  const hrText = document.getElementById("liveHr")?.innerText || "--";
-  const measureTime = document.getElementById("measureTime")?.innerText || "--:--:--";
+  database.ref("patients/" + patientId + "/healthData").push({
+    timestamp: new Date().toISOString(),
+    spo2: parseFloat(spo2),
+    temperature: parseFloat(temp),
+    heart_rate: isNaN(hr) ? hrText : hr,
 
-  if (spo2Text === "--" || tempText === "--" || hrText === "--") {
-    alert("Chưa có dữ liệu đo để lưu");
-    return;
-  }
-
-  const spo2 = parseFloat(spo2Text);
-  const temp = parseFloat(tempText);
-  const heartRate = parseFloat(hrText);
-
-  if (isNaN(spo2) || isNaN(temp) || isNaN(heartRate)) {
-    alert("Dữ liệu đo chưa hợp lệ");
-    return;
-  }
-
-  database.ref("patients/" + patientId + "/profile").once("value")
-    .then((snapshot) => {
-      const profile = snapshot.val();
-
-      if (!profile) {
-        alert("Vui lòng lưu thông tin bệnh nhân trước");
-        throw new Error("NO_PROFILE");
-      }
-
-      const name = (profile.name || "").trim();
-      const age = Number(profile.age);
-      const gender = profile.gender || "";
-
-      if (!name) {
-        alert("Bệnh nhân chưa có họ tên");
-        throw new Error("INVALID_NAME");
-      }
-
-      if (!Number.isInteger(age) || age < 0 || age > 120) {
-        alert("Bệnh nhân chưa có tuổi hợp lệ");
-        throw new Error("INVALID_AGE");
-      }
-
-      if (!gender) {
-        alert("Bệnh nhân chưa có giới tính");
-        throw new Error("INVALID_GENDER");
-      }
-
-      const now = new Date();
-      const recordTimestamp = latestMeasurement?.timestamp || now.toISOString();
-
-      const record = {
-        timestamp: recordTimestamp,
-        spo2: spo2,
-        temperature: temp,
-        heart_rate: heartRate,
-        patient_name: name,
-        age: age,
-        gender: gender,
-        saved_at: now.toISOString(),
-        measure_time: measureTime,
-        source: "manual_save"
-      };
-
-      return database.ref("patients/" + patientId + "/healthData").push(record)
-        .then(() => {
-          return database.ref("trigger_analysis").set({
-            patient_id: patientId,
-            timestamp: now.toISOString(),
-            requested_from: "web_app"
-          });
-        });
-    })
-    .then(() => {
-      loadPatientHistory();
-      loadPatientInfo(patientId, patientName);
-      alert("Đã lưu kết quả cho " + patientName + ". AI đang phân tích...");
-    })
-    .catch((error) => {
-      if (
-        error.message !== "NO_PROFILE" &&
-        error.message !== "INVALID_NAME" &&
-        error.message !== "INVALID_AGE" &&
-        error.message !== "INVALID_GENDER"
-      ) {
-        console.error("Lỗi lưu dữ liệu:", error);
-        alert("Lưu thất bại");
-      }
-    });
+    // Thêm dữ liệu AI
+    ai_status: aiStatus,
+    ai_advice: aiAdvice,
+    ai_risk: aiRisk,
+    ai_time: aiTime
+  })
+  .then(() => {
+    alert("Đã lưu kết quả cho " + patientName);
+  })
+  .catch((error) => {
+    console.error("Lỗi lưu dữ liệu:", error);
+    alert("Lưu thất bại");
+  });
 }
 
 function goBack() {
+  // Tắt các lắng nghe Firebase cũ để tránh tốn tài nguyên và sai lệch dữ liệu
   if (patientListenerRef) {
     patientListenerRef.off();
     patientListenerRef = null;
@@ -315,13 +224,15 @@ function goBack() {
 }
 
 function resetPatientUI() {
+  // Reset các chỉ số text
   document.getElementById("spo2").innerText = "--";
   document.getElementById("temp").innerText = "--";
   document.getElementById("ecg").innerText = "--";
 
+  // Reset khu vực hiển thị AI
   if (document.getElementById("ai-status")) {
-    document.getElementById("ai-status").innerText = "Chưa có kết quả";
-    document.getElementById("ai-advice").innerText = "AI sẽ nhận xét sau khi bạn lưu kết quả đo cho bệnh nhân đã có tuổi và giới tính.";
+    document.getElementById("ai-status").innerText = "Đang chờ dữ liệu...";
+    document.getElementById("ai-advice").innerText = "Hệ thống AI đang khởi động...";
     document.getElementById("ai-risk").innerText = "0";
     document.getElementById("ai-time").innerText = "--:--:--";
     document.getElementById("ai-status-box").className = "";
@@ -334,9 +245,10 @@ function resetPatientUI() {
   document.getElementById("ecg").classList.remove("safe", "warning", "danger");
 
   if (document.getElementById("trendComment")) {
-    document.getElementById("trendComment").innerText = "Đang phân tích dữ liệu...";
-  }
+  document.getElementById("trendComment").innerText = "Đang phân tích dữ liệu...";
+}
 
+  // Xóa mảng dữ liệu biểu đồ
   labels.length = 0;
   spo2Data.length = 0;
   tempData.length = 0;
@@ -365,6 +277,7 @@ function resetPatientUI() {
     dailyChart = null;
   }
 
+  // Reset giao diện trang kết quả đo hiện tại
   if (document.getElementById("liveSpo2")) {
     document.getElementById("liveSpo2").innerText = "--";
     document.getElementById("liveTemp").innerText = "--";
@@ -380,12 +293,13 @@ function resetPatientUI() {
     document.getElementById("liveHr").classList.remove("safe", "warning", "danger");
   }
 
+  // Reset tab thông tin bệnh nhân
   if (document.getElementById("infoNameInput")) {
     document.getElementById("infoNameInput").value = "";
     document.getElementById("infoAgeInput").value = "";
     document.getElementById("infoGenderInput").value = "";
-    document.getElementById("infoAiStatus").innerText = "Chưa có dữ liệu";
-    document.getElementById("infoAiAdvice").innerText = "Chưa có kết quả AI gần nhất.";
+    document.getElementById("infoAiStatus").innerText = "Đang chờ dữ liệu...";
+    document.getElementById("infoAiAdvice").innerText = "Chưa có dữ liệu AI.";
     document.getElementById("infoAiTime").innerText = "--:--:--";
   }
 }
@@ -415,8 +329,8 @@ function loadPatientInfo(patientId, patientName) {
       return;
     }
 
-    document.getElementById("infoAiStatus").innerText = data.current_status || "--";
-    document.getElementById("infoAiAdvice").innerText = data.advice || data.ai_prediction || "--";
+    document.getElementById("infoAiStatus").innerText = data.status || "--";
+    document.getElementById("infoAiAdvice").innerText = data.advice || "--";
     document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
   });
 }
@@ -438,8 +352,8 @@ function listenToAIAlerts(patientId) {
     const riskEl = document.getElementById("ai-risk");
     const statusBox = document.getElementById("ai-status-box");
 
-    const safeStatus = data.current_status || "--";
-    const safeAdvice = data.advice || data.ai_prediction || "Chưa có lời khuyên từ AI.";
+    const safeStatus = data.status || data.message || "--";
+    const safeAdvice = data.advice || data.message || "Chưa có lời khuyên từ AI.";
     const safeTime = data.timestamp_ai || "--:--:--";
     const safeRisk = Math.round((data.risk_score || 0) * 100);
 
@@ -448,6 +362,7 @@ function listenToAIAlerts(patientId) {
     if (timeEl) timeEl.innerText = safeTime;
     if (riskEl) riskEl.innerText = safeRisk;
 
+    // thêm ở đây
     const measureStatusEl = document.getElementById("measureAiStatus");
     const measureAdviceEl = document.getElementById("measureAiAdvice");
     const measureRiskEl = document.getElementById("measureRisk");
@@ -457,9 +372,9 @@ function listenToAIAlerts(patientId) {
     if (measureRiskEl) measureRiskEl.innerText = safeRisk;
 
     if (document.getElementById("infoAiStatus")) {
-      document.getElementById("infoAiStatus").innerText = safeStatus;
-      document.getElementById("infoAiAdvice").innerText = safeAdvice;
-      document.getElementById("infoAiTime").innerText = safeTime;
+      document.getElementById("infoAiStatus").innerText = data.status || data.message || "--";
+      document.getElementById("infoAiAdvice").innerText = data.advice || data.message || "Chưa có lời khuyên từ AI.";
+      document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
     }
 
     if (statusBox) {
@@ -541,38 +456,61 @@ client.on("connect", function() {
 
 client.on("message", function(topic, message) {
   const data = JSON.parse(message.toString());
+  const dataPatientId = data.patientId || "patient_01";
   console.log("MQTT DATA:", data);
 
-  const now = new Date();
+  const timestamp = data.timestamp || new Date().toISOString();
+  const displayTime = new Date().toLocaleString();
 
-  function pad2(n) {
-    return String(n).padStart(2, "0");
-  }
-
-  const espTime = data.time;
-
-  const timestamp = espTime
-    ? `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}T${espTime}`
-    : (data.timestamp || now.toISOString());
-
-  const displayTime = espTime || now.toLocaleTimeString();
-
+  // Đọc dữ liệu số
   const spo2 = parseFloat(data.spo2);
   const temp = parseFloat(data.temperature ?? data.temp);
   const heartRate = parseFloat(
     data.heart_rate ?? data.bpm ?? data.hr ?? data.heartRate
   );
 
-  latestMeasurement = {
-    timestamp: timestamp,
-    spo2: isNaN(spo2) ? null : spo2,
-    temperature: isNaN(temp) ? null : temp,
-    heart_rate: isNaN(heartRate) ? null : heartRate
-  };
+ // Cập nhật giao diện trang "Xem kết quả đo"
+if (document.getElementById("liveSpo2")) {
+  const liveSpo2El = document.getElementById("liveSpo2");
+  const liveTempEl = document.getElementById("liveTemp");
+  const liveHrEl = document.getElementById("liveHr");
 
-  // Luồng dữ liệu thô chung cho AI
+  liveSpo2El.innerText = isNaN(spo2) ? "--" : spo2;
+  liveTempEl.innerText = isNaN(temp) ? "--" : temp;
+  liveHrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
+  document.getElementById("measureTime").innerText = displayTime;
+
+  document.getElementById("saveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
+  document.getElementById("saveTemp").innerText = isNaN(temp) ? "--" : temp;
+  document.getElementById("saveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
+  document.getElementById("saveTime").innerText = displayTime;
+
+  liveSpo2El.classList.remove("safe", "warning", "danger");
+  liveTempEl.classList.remove("safe", "warning", "danger");
+  liveHrEl.classList.remove("safe", "warning", "danger");
+
+  if (!isNaN(spo2)) {
+    if (spo2 >= 95) liveSpo2El.classList.add("safe");
+    else if (spo2 >= 92) liveSpo2El.classList.add("warning");
+    else liveSpo2El.classList.add("danger");
+  }
+
+  if (!isNaN(temp)) {
+    if (temp < 37.5) liveTempEl.classList.add("safe");
+    else if (temp <= 37.8) liveTempEl.classList.add("warning");
+    else liveTempEl.classList.add("danger");
+  }
+
+  if (!isNaN(heartRate)) {
+    if (heartRate >= 60 && heartRate <= 100) liveHrEl.classList.add("safe");
+    else if (heartRate >= 50 && heartRate <= 120) liveHrEl.classList.add("warning");
+    else liveHrEl.classList.add("danger");
+  }
+}
+
+  // LƯU VÀO FIREBASE
   if (!isNaN(spo2) && !isNaN(temp) && !isNaN(heartRate)) {
-    database.ref("healthData").push({
+    database.ref("patients/" + dataPatientId + "/healthData").push({
       timestamp: timestamp,
       spo2: spo2,
       temperature: temp,
@@ -580,37 +518,55 @@ client.on("message", function(topic, message) {
     });
   }
 
-  // Chỉ cập nhật trang đo hiện tại
-  if (document.getElementById("liveSpo2")) {
-    const liveSpo2El = document.getElementById("liveSpo2");
-    const liveTempEl = document.getElementById("liveTemp");
-    const liveHrEl = document.getElementById("liveHr");
-
-    liveSpo2El.innerText = isNaN(spo2) ? "--" : spo2;
-    liveTempEl.innerText = isNaN(temp) ? "--" : temp;
-    liveHrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
-    document.getElementById("measureTime").innerText = displayTime;
-
-    document.getElementById("saveSpo2").innerText = isNaN(spo2) ? "--" : spo2;
-    document.getElementById("saveTemp").innerText = isNaN(temp) ? "--" : temp;
-    document.getElementById("saveHr").innerText = isNaN(heartRate) ? "--" : heartRate;
-    document.getElementById("saveTime").innerText = displayTime;
-
-    applySpo2Color(liveSpo2El, spo2);
-    applyTempColor(liveTempEl, temp);
-
-    liveHrEl.classList.remove("safe", "warning", "danger");
-    if (!isNaN(heartRate)) {
-      if (heartRate >= 60 && heartRate <= 100) liveHrEl.classList.add("safe");
-      else if (heartRate >= 50 && heartRate <= 120) liveHrEl.classList.add("warning");
-      else liveHrEl.classList.add("danger");
-    }
+  // Cập nhật giao diện nếu đang xem đúng bệnh nhân
+  if (!currentPatientId || dataPatientId !== currentPatientId) {
+    return;
+  }
+const spo2El = document.getElementById("spo2");
+spo2El.innerText = isNaN(spo2) ? "--" : spo2;
+spo2El.classList.remove("safe", "warning", "danger");
+if (!isNaN(spo2)) {
+  if (spo2 >= 95) spo2El.classList.add("safe");
+  else if (spo2 >= 92) spo2El.classList.add("warning");
+  else spo2El.classList.add("danger");
+}
+  // Cập nhật hiển thị số & màu sắc Nhiệt độ
+  const tempEl = document.getElementById("temp");
+  tempEl.innerText = isNaN(temp) ? "--" : temp;
+  tempEl.classList.remove("safe", "warning", "danger");
+  if (!isNaN(temp)) {
+    if (temp < 37.5) tempEl.classList.add("safe");
+    else if (temp <= 37.8) tempEl.classList.add("warning");
+    else tempEl.classList.add("danger");
   }
 
-  // KHÔNG cập nhật trực tiếp dashboard bệnh nhân ở đây nữa
-  // Dashboard chỉ lấy từ /patients/{patientId}/healthData khi đã lưu
-});
+  // Cập nhật hiển thị số & màu sắc Nhịp tim
+  const hrEl = document.getElementById("ecg");
+  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate ;
+  hrEl.classList.remove("safe", "warning", "danger");
+  if (!isNaN(heartRate)) {
+    if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
+    else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
+    else hrEl.classList.add("danger");
+  }
 
+  // Cập nhật biểu đồ Realtime (giới hạn 20 điểm dữ liệu)
+  labels.push(displayTime);
+  spo2Data.push(isNaN(spo2) ? null : spo2);
+  tempData.push(isNaN(temp) ? null : temp);
+  hrData.push(isNaN(heartRate) ? null : heartRate);
+
+  if (labels.length > 20) {
+    labels.shift();
+    spo2Data.shift();
+    tempData.shift();
+    hrData.shift();
+  }
+
+  spo2Chart.update();
+  tempChart.update();
+  hrChart.update();
+});
 
 client.on("error", function(err) {
   console.log("MQTT Error:", err);
@@ -646,6 +602,7 @@ function loadPatientHistory() {
 
     const records = Object.values(data).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
+    // Lấy 20 bản ghi cuối cho biểu đồ
     const latest20 = records.slice(-20);
     latest20.forEach(item => {
       const displayTime = new Date(item.timestamp).toLocaleString();
@@ -655,22 +612,26 @@ function loadPatientHistory() {
       hrData.push(Number(item.heart_rate));
     });
 
+    // Cập nhật giá trị hiển thị lớn (Latest)
     const latest = records[records.length - 1];
     if (latest) {
       updateLatestPatient(latest);
     }
 
-    records.slice().reverse().forEach(item => {
-      const displayTime = new Date(item.timestamp).toLocaleString();
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <p><strong>${displayTime}</strong></p>
-        <p>SpO2: ${item.spo2}% | Temp: ${item.temperature}°C | Heart Rate: ${item.heart_rate} BPM</p>
-      `;
-      historyList.appendChild(card);
-    });
-
+    // Hiển thị danh sách card lịch sử (mới nhất lên đầu)
+   records.slice().reverse().forEach(item => {
+  const displayTime = new Date(item.timestamp).toLocaleString();
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <p><strong>${displayTime}</strong></p>
+    <p>SpO2: ${item.spo2}% | Temp: ${item.temperature}°C | Heart Rate: ${item.heart_rate} BPM</p>
+    <p><strong>Trạng thái AI:</strong> ${item.ai_status || "--"} | <strong>Rủi ro:</strong> ${item.ai_risk ?? 0}%</p>
+    <p><strong>Lời khuyên AI:</strong> ${item.ai_advice || "Chưa có lời khuyên"}</p>
+    <p><strong>Thời gian AI:</strong> ${item.ai_time || "--:--:--"}</p>
+  `;
+  historyList.appendChild(card);
+});
     spo2Chart.update();
     tempChart.update();
     hrChart.update();
@@ -688,12 +649,24 @@ function updateLatestPatient(item) {
 
   spo2El.innerText = isNaN(spo2) ? "--" : spo2;
   tempEl.innerText = isNaN(temp) ? "--" : temp;
-  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate;
+  hrEl.innerText = isNaN(heartRate) ? "--" : heartRate ;
 
-  applySpo2Color(spo2El, spo2);
-  applyTempColor(tempEl, temp);
-
+  spo2El.classList.remove("safe", "warning", "danger");
+  tempEl.classList.remove("safe", "warning", "danger");
   hrEl.classList.remove("safe", "warning", "danger");
+
+  if (!isNaN(spo2)) {
+    if (spo2 >= 95) spo2El.classList.add("safe");
+    else if (spo2 >= 92) spo2El.classList.add("warning");
+    else spo2El.classList.add("danger");
+  }
+
+  if (!isNaN(temp)) {
+    if (temp < 37.5) tempEl.classList.add("safe");
+    else if (temp <= 37.8) tempEl.classList.add("warning");
+    else tempEl.classList.add("danger");
+  }
+
   if (!isNaN(heartRate)) {
     if (heartRate >= 60 && heartRate <= 100) hrEl.classList.add("safe");
     else if (heartRate >= 50 && heartRate <= 120) hrEl.classList.add("warning");
@@ -721,6 +694,7 @@ function loadDailyData() {
       grouped[date].hr.push(Number(item.heart_rate));
     });
 
+    // Lấy dữ liệu của 3 ngày gần nhất
     const dates = Object.keys(grouped).sort().slice(-3);
     const avgSpo2 = [];
     const avgTemp = [];
@@ -781,7 +755,6 @@ function updateTrendComment(dates, avgSpo2, avgTemp, avgHR) {
 
   trendEl.innerText = `${spo2Text}, ${tempText}, ${hrText} trong những lần đo gần đây.`;
 }
-
 function drawDailyChart(dates, spo2Data, tempData, hrData) {
   const canvas = document.getElementById("dailyChart");
   if (!canvas) return;
@@ -817,57 +790,57 @@ function drawDailyChart(dates, spo2Data, tempData, hrData) {
 }
 
 // ===== 7. TÍCH HỢP XEM KẾT QUẢ ĐO AI (TỪ NHÁNH /alerts) =====
-document.addEventListener("DOMContentLoaded", () => {
-  const btnXemKetQua = document.getElementById("btn-xem-ket-qua");
-  const ketQuaBox = document.getElementById("ket-qua-box");
+document.addEventListener('DOMContentLoaded', () => {
+    const btnXemKetQua = document.getElementById('btn-xem-ket-qua');
+    const ketQuaBox = document.getElementById('ket-qua-box');
 
-  if (btnXemKetQua && ketQuaBox) {
-    btnXemKetQua.addEventListener("click", () => {
-      btnXemKetQua.innerText = "Đang tải dữ liệu...";
-      btnXemKetQua.disabled = true;
+    if (btnXemKetQua && ketQuaBox) {
+        btnXemKetQua.addEventListener('click', () => {
+            
+            // Đổi text của nút để người dùng biết đang tải
+            btnXemKetQua.innerText = "Đang tải dữ liệu...";
+            btnXemKetQua.disabled = true;
 
-      if (!currentPatientId) {
-        alert("Vui lòng chọn bệnh nhân trước");
-        btnXemKetQua.innerText = "Xem kết quả đo";
-        btnXemKetQua.disabled = false;
-        return;
-      }
+            // Sử dụng biến 'database' (chuẩn v8) đã khởi tạo ở đầu trang
+            database.ref('alerts').once('value')
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    // Điền dữ liệu vào các thẻ HTML tương ứng
+                    document.getElementById('val-hr').innerText = data.heart_rate;
+                    document.getElementById('val-temp').innerText = data.temperature;
+                    document.getElementById('val-spo2').innerText = data.spo2;
+                    
+                    // Điền thông điệp từ Rule-based và AI
+                    document.getElementById('val-current-status').innerText = data.current_status;
+                    document.getElementById('val-ai-advice').innerText = data.ai_prediction;
+                    document.getElementById('val-time').innerText = data.timestamp_ai;
 
-      database.ref("patients/" + currentPatientId + "/alerts").once("value")
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
+                    // Tùy chỉnh màu sắc dựa trên mức độ nguy hiểm (status_code từ backend)
+                    const statusEl = document.getElementById('val-ai-advice');
+                    if (data.status_code === 2) {
+                        statusEl.style.color = "red"; // Nguy hiểm
+                    } else if (data.status_code === 1) {
+                        statusEl.style.color = "orange"; // Cảnh báo
+                    } else {
+                        statusEl.style.color = "green"; // Bình thường
+                    }
 
-            document.getElementById("val-hr").innerText = data.heart_rate ?? "--";
-            document.getElementById("val-temp").innerText = data.temperature ?? "--";
-            document.getElementById("val-spo2").innerText = data.spo2 ?? "--";
+                    // Hiển thị khung kết quả
+                    ketQuaBox.style.display = 'block';
 
-            document.getElementById("val-current-status").innerText = data.current_status || "--";
-            document.getElementById("val-ai-advice").innerText = data.ai_prediction || data.advice || "--";
-            document.getElementById("val-time").innerText = data.timestamp_ai || "--:--:--";
-
-            const statusEl = document.getElementById("val-ai-advice");
-            if (data.status_code === 2) {
-              statusEl.style.color = "red";
-            } else if (data.status_code === 1) {
-              statusEl.style.color = "orange";
-            } else {
-              statusEl.style.color = "green";
-            }
-
-            ketQuaBox.style.display = "block";
-          } else {
-            alert("Chưa có dữ liệu phân tích từ AI. Vui lòng lưu kết quả đo trước.");
-          }
-        })
-        .catch((error) => {
-          console.error("Lỗi khi tải dữ liệu:", error);
-          alert("Lỗi kết nối đến cơ sở dữ liệu.");
-        })
-        .finally(() => {
-          btnXemKetQua.innerText = "Xem kết quả đo";
-          btnXemKetQua.disabled = false;
+                } else {
+                    alert("Chưa có dữ liệu phân tích từ AI. Vui lòng chờ hệ thống thu thập đủ mẫu!");
+                }
+            }).catch((error) => {
+                console.error("Lỗi khi tải dữ liệu:", error);
+                alert("Lỗi kết nối đến cơ sở dữ liệu.");
+            }).finally(() => {
+                // Khôi phục lại trạng thái của nút bấm
+                btnXemKetQua.innerText = "Xem kết quả đo";
+                btnXemKetQua.disabled = false;
+            });
         });
-    });
-  }
+    }
 });
