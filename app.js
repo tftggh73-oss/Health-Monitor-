@@ -100,6 +100,19 @@ function applyHrColor(el, heartRate, age = 25, gender = "Nam") {
   }
 }
 
+// ===== HÀM MÀU AI DÙNG CHUNG =====
+function getAiStatusClass(statusCode) {
+  if (statusCode === 2) return "ai-danger";
+  if (statusCode === 1) return "ai-warning";
+  return "ai-safe";
+}
+
+function applyAiClass(element, statusCode) {
+  if (!element) return;
+  element.classList.remove("ai-safe", "ai-warning", "ai-danger");
+  element.classList.add(getAiStatusClass(statusCode));
+}
+
 // ===== HÀM DÙNG CHUNG =====
 function getProfileFromInputs() {
   return {
@@ -310,6 +323,9 @@ function loadPatientInfo(patientId, patientName) {
     document.getElementById("infoAiStatus").innerText = data.current_status || "--";
     document.getElementById("infoAiAdvice").innerText = data.advice || data.ai_prediction || "--";
     document.getElementById("infoAiTime").innerText = data.timestamp_ai || "--:--:--";
+
+    applyAiClass(document.getElementById("infoAiStatus"), data.status_code);
+    applyAiClass(document.getElementById("infoAiAdvice"), data.status_code);
   });
 }
 
@@ -486,6 +502,9 @@ function resetPatientUI() {
     document.getElementById("infoAiStatus").innerText = "Chưa có dữ liệu";
     document.getElementById("infoAiAdvice").innerText = "Chưa có kết quả AI gần nhất.";
     document.getElementById("infoAiTime").innerText = "--:--:--";
+
+    document.getElementById("infoAiStatus").classList.remove("ai-safe", "ai-warning", "ai-danger");
+    document.getElementById("infoAiAdvice").classList.remove("ai-safe", "ai-warning", "ai-danger");
   }
 }
 
@@ -529,16 +548,14 @@ function listenToAIAlerts(patientId) {
       document.getElementById("infoAiTime").innerText = safeTime;
     }
 
-    if (statusBox) {
-      statusBox.classList.remove("ai-safe", "ai-warning", "ai-danger");
-      if (data.status_code === 0) {
-        statusBox.classList.add("ai-safe");
-      } else if (data.status_code === 1) {
-        statusBox.classList.add("ai-warning");
-      } else if (data.status_code === 2) {
-        statusBox.classList.add("ai-danger");
-      }
-    }
+    // Đồng bộ toàn bộ màu AI theo status_code của AI
+    applyAiClass(statusBox, data.status_code);
+    applyAiClass(statusEl, data.status_code);
+    applyAiClass(adviceEl, data.status_code);
+    applyAiClass(measureStatusEl, data.status_code);
+    applyAiClass(measureAdviceEl, data.status_code);
+    applyAiClass(document.getElementById("infoAiStatus"), data.status_code);
+    applyAiClass(document.getElementById("infoAiAdvice"), data.status_code);
   });
 }
 
@@ -628,7 +645,6 @@ client.on("message", function(topic, message) {
     data.heart_rate ?? data.bpm ?? data.hr ?? data.heartRate
   );
 
-  // Chỉ lưu tạm để bấm Lưu mới gán cho bệnh nhân
   latestMeasurement = {
     timestamp: timestamp,
     spo2: isNaN(spo2) ? null : spo2,
@@ -636,7 +652,6 @@ client.on("message", function(topic, message) {
     heart_rate: isNaN(heartRate) ? null : heartRate
   };
 
-  // Luồng dữ liệu thô chung cho AI
   if (!isNaN(spo2) && !isNaN(temp) && !isNaN(heartRate)) {
     database.ref("healthData").push({
       timestamp: timestamp,
@@ -646,7 +661,6 @@ client.on("message", function(topic, message) {
     });
   }
 
-  // CHỈ cập nhật trang đo hiện tại, KHÔNG cập nhật dashboard bệnh nhân
   updateMeasurementUI(spo2, temp, heartRate, displayTime);
 });
 
@@ -879,14 +893,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("val-ai-advice").innerText = data.ai_prediction || data.advice || "--";
             document.getElementById("val-time").innerText = data.timestamp_ai || "--:--:--";
 
-            const statusEl = document.getElementById("val-ai-advice");
-            if (data.status_code === 2) {
-              statusEl.style.color = "red";
-            } else if (data.status_code === 1) {
-              statusEl.style.color = "orange";
-            } else {
-              statusEl.style.color = "green";
-            }
+            applyAiClass(document.getElementById("val-current-status"), data.status_code);
+            applyAiClass(document.getElementById("val-ai-advice"), data.status_code);
 
             ketQuaBox.style.display = "block";
           } else {
