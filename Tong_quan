@@ -33,32 +33,48 @@
   <p>VUI LÒNG CHỌN BỆNH NHÂN GIÁM SÁT</p>
 </div>
   <div class="patient-row">
-  <div class="patient-item" onclick="selectPatient('patient_01', document.getElementById('patientLabel_patient_01').innerText)">
+  <div class="patient-item" onclick="selectPatientSafe('patient_01', document.getElementById('patientLabel_patient_01').innerText)">
   <img src="BN1.png" class="patient-image">
   <p id="patientLabel_patient_01">A</p>
 </div>
-<div class="patient-item" onclick="selectPatient('patient_02', document.getElementById('patientLabel_patient_02').innerText)">
+<div class="patient-item" onclick="selectPatientSafe('patient_02', document.getElementById('patientLabel_patient_02').innerText)">
   <img src="BN2.png" class="patient-image">
   <p id="patientLabel_patient_02">B</p>
 </div>
-<div class="patient-item" onclick="selectPatient('patient_03', document.getElementById('patientLabel_patient_03').innerText)">
+<div class="patient-item" onclick="selectPatientSafe('patient_03', document.getElementById('patientLabel_patient_03').innerText)">
   <img src="BN3.png" class="patient-image">
   <p id="patientLabel_patient_03">C</p>
 </div>
-<div class="patient-item" onclick="selectPatient('patient_04', document.getElementById('patientLabel_patient_04').innerText)">
+<div class="patient-item" onclick="selectPatientSafe('patient_04', document.getElementById('patientLabel_patient_04').innerText)">
   <img src="BN4.png" class="patient-image">
   <p id="patientLabel_patient_04">D</p>
 </div>
-<div class="patient-item" onclick="selectPatient('patient_05', document.getElementById('patientLabel_patient_05').innerText)">
+<div class="patient-item" onclick="selectPatientSafe('patient_05', document.getElementById('patientLabel_patient_05').innerText)">
   <img src="BN5.png" class="patient-image">
   <p id="patientLabel_patient_05">E</p>
 </div>
   </div>
    <div class="measure-action">
-  <button class="view-result-btn" onclick="openMeasurementPage()">Xem kết quả đo</button>
+  <button class="view-result-btn" onclick="openMeasurementPageSafe()">Xem kết quả đo</button>
 </div>
   </div>
 
   <script src="app.js"></script>
+
+  <!-- Script an toàn cho trang index -->
+  <script>
+    // Hàm an toàn tránh lỗi khi các trang khác chưa load
+    function selectPatientSafe(id, name) {
+      localStorage.setItem('selectedPatientId', id);
+      localStorage.setItem('selectedPatientName', name);
+      alert(`Đã chọn: ${name}\n\nChuyển sang trang chi tiết bệnh nhân...`);
+      // window.location.href = "dashboard.html";   // sau này dùng
+    }
+
+    function openMeasurementPageSafe() {
+      alert("Chuyển sang trang Kết quả đo...");
+      // window.location.href = "measurement.html";
+    }
+  </script>
 </body>
 </html>
